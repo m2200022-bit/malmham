@@ -212,12 +212,47 @@ tr.soon{background:var(--soon-bg)} tr.late{background:var(--late-bg)}
 .replybox{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:9px}
 .replybox .hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-family:var(--watad);font-size:13.5px}
 .replybox.done{border-color:#BFE0D2;background:var(--ok-bg)}
-#late-depts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+#late-depts{display:block}
 .lateA-col{background:#fff;border:1px solid #EFCBD0;border-radius:10px;padding:10px}
 .lateA-col .it{border-bottom:1px dotted #E3B9C0;padding:6px 0;font-size:13px}
 .lateA-col .it:last-child{border:0}
 td.reply-cell{min-width:180px}
 .mini{font-size:11.5px;color:var(--muted)}
+
+
+.followrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-top:6px}
+.late-list .lm{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;
+  background:#fff;border:1px solid #EFCBD0;border-radius:9px;padding:8px 11px;margin-bottom:7px}
+.late-list .lm b{color:var(--late);font-family:var(--watad);direction:ltr}
+.late-list .lm .t{font-size:13px}
+.late-list .lm .d{font-size:12px;color:var(--late);font-family:var(--watad);white-space:nowrap}
+.late-total{display:inline-flex;align-items:center;gap:8px;background:var(--late);color:#fff;
+  border-radius:20px;padding:5px 14px;font-family:var(--watad);font-size:13px}
+
+
+/* ===== بطاقة المذكرة (تصميم الأسطر) ===== */
+.arch-card{border:2px solid #111 !important;border-radius:10px;padding:12px 14px}
+.arch-card.lateA{background:var(--soon-bg)} .arch-card.doneA{background:var(--ok-bg)}
+.m-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:7px}
+.m-no{font-family:var(--watad);font-size:21px;font-weight:700;color:var(--maroon);direction:ltr}
+.m-date{font-family:var(--watad);font-size:13px;color:#111;border:1px solid #111;border-radius:6px;padding:2px 9px;direction:ltr}
+.m-title{font-family:var(--watad);font-size:15.5px;flex:1;min-width:180px}
+.m-act{font-size:12px;border:1px solid #111;border-radius:6px;padding:2px 10px;background:#fff}
+.m-sender{font-size:12.5px;color:var(--ink-soft)}
+.m-sender b{color:#111;font-family:var(--watad)}
+.b-blue{border:1.5px solid var(--blue) !important;color:var(--blue) !important;background:var(--blue-soft) !important}
+.b-state{font-family:var(--watad);font-size:12.5px;border-radius:20px;padding:3px 12px;border:1.5px solid}
+.b-state.open{background:var(--soon-bg);border-color:#D4A017;color:#8A6B10}
+.b-state.doneS{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.m-lbl{font-size:11.5px;color:var(--muted);font-family:var(--watad);margin-inline-end:4px}
+.arch-card .foot{border-top:1px dashed #ccc;padding-top:8px;margin-top:9px}
+/* الأقسام المتأخرة كمربعات متجاورة */
+.late-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;width:100%}
+.late-list .lm{display:block;background:#fff;border:2px solid var(--late);border-radius:10px;padding:10px 12px;cursor:pointer}
+.late-list .lm b{color:var(--late);font-family:var(--watad);direction:ltr;font-size:18px}
+.late-list .lm .t{font-size:13px;margin-top:3px;display:block}
+.late-list .lm .d{display:inline-block;margin-top:6px;background:var(--late);color:#fff;border-radius:20px;
+  padding:2px 10px;font-size:12px;font-family:var(--watad)}
 
 /* ===== لوحة الإحصائية ===== */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:0;background:#fff;
@@ -297,11 +332,14 @@ td.reply-cell{min-width:180px}
       <label class="icon-btn sec" style="margin:0;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>استيراد من إكسل<input type="file" accept=".xlsx,.xls,.csv" id="imp-contact" style="display:none"></label>
     </div>
     <div class="tools">
-      <input type="search" id="c-search" placeholder="ابحث بالاسم أو الإدارة أو الخط…">
+      <select id="c-fd" data-deptsel="1" style="max-width:190px"></select>
+      <select id="c-fs" data-secfor="c-fd" style="max-width:180px"></select>
+      <input type="search" id="c-search" placeholder="ابحث بالاسم أو الخط أو الجوال…">
+      <button class="icon-btn sec" id="c-to-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>نقل المحدد إلى المراسلات</button>
       <span class="empty" id="c-count" style="padding:0"></span>
     </div>
     <div class="sheet"><div class="scroll"><table>
-      <thead><tr><th>م</th><th>اسم الموظف</th><th>الخط</th><th>الجوال</th><th>الصفة</th><th>الإدارة</th><th>القسم</th><th>إجراءات</th></tr></thead>
+      <thead><tr><th style="width:34px"><input type="checkbox" id="c-all" style="width:auto" title="تحديد الكل"></th><th>م</th><th>اسم الموظف</th><th>الخط</th><th>الجوال</th><th>البريد الإلكتروني</th><th>الصفة</th><th>الإدارة</th><th>القسم</th><th>إجراءات</th></tr></thead>
       <tbody id="c-body"></tbody></table></div></div>
     <div class="empty" id="c-empty">لا توجد أرقام بعد. ابدأ بزر «إضافة رقم».</div>
   </div>
@@ -318,14 +356,17 @@ td.reply-cell{min-width:180px}
     </div>
     <div class="tools">
       <button class="btn ghost sm" id="sel-all">تحديد الكل</button>
-      <button class="btn ghost sm" id="sel-mgr">تحديد المدراء</button>
+      <button class="btn ghost sm" id="sel-mgr">تحديد المدراء ورؤساء الأقسام</button>
       <button class="btn ghost sm" id="sel-sec">تحديد السكرتارية</button>
       <button class="btn ghost sm" id="sel-none">إلغاء التحديد</button>
+      <select id="m-fd" data-deptsel="1" style="max-width:190px"></select>
+      <select id="m-fs" data-secfor="m-fd" style="max-width:180px"></select>
+      <input type="search" id="m-search" placeholder="ابحث بالاسم أو الإيميل…" style="max-width:210px">
       <label style="display:flex;gap:6px;align-items:center;margin:0;font-size:13px;color:var(--ink)">
-        <input type="checkbox" id="cc-mgr" checked style="width:auto"> إرسال نسخة (CC) للمدراء</label>
+        <input type="checkbox" id="cc-mgr" checked style="width:auto"> إرسال نسخة (CC) للمدراء ورؤساء الأقسام</label>
     </div>
     <div class="sheet"><div class="scroll"><table>
-      <thead><tr><th style="width:34px"></th><th>م</th><th>الاسم</th><th>الإدارة</th><th>القسم</th><th>الإيميل</th><th>الصفة</th><th>إجراءات</th></tr></thead>
+      <thead><tr><th style="width:34px"></th><th>م</th><th>الاسم</th><th>الإدارة</th><th>القسم</th><th>الإيميل</th><th>الخط</th><th>الجوال</th><th>الصفة</th><th>إجراءات</th></tr></thead>
       <tbody id="m-body"></tbody></table></div></div>
     <div class="empty" id="m-empty">لا توجد عناوين بعد.</div>
     <div class="fgrid" style="margin-top:14px">
@@ -387,6 +428,8 @@ td.reply-cell{min-width:180px}
     </div>
     <div class="tools">
       <select id="a-status"><option value="all">كل الحالات</option><option value="open">تحت المتابعة</option><option value="lateA">متأخرة</option><option value="done">أنجزت</option></select>
+      <select id="a-fd" data-deptsel="1" style="max-width:190px"></select>
+      <select id="a-fs" data-secfor="a-fd" style="max-width:180px"></select>
       <input type="search" id="a-search" placeholder="ابحث برقم المذكرة أو العنوان أو الجهة…">
       <button class="btn ghost sm" id="av-cards">عرض مربعات</button>
       <button class="btn ghost sm" id="av-table">عرض جدول</button>
@@ -396,7 +439,8 @@ td.reply-cell{min-width:180px}
     </div>
 
     <div class="panel" id="late-panel" style="margin:0 0 14px;background:var(--late-bg);border-color:#EFCBD0">
-      <div class="panel-head"><h2 style="font-size:16px;color:var(--late)">الأقسام المتأخرة</h2></div>
+      <div class="panel-head"><h2 style="font-size:16px;color:var(--late)">المذكرات المتأخرة</h2>
+        <span id="late-badges"></span></div>
       <div id="late-depts"></div>
       <div class="legend" style="margin-top:10px">
         <span><i style="background:var(--soon)"></i>مذكرة تجاوزت 4 أيام عمل</span>
@@ -408,7 +452,7 @@ td.reply-cell{min-width:180px}
         <div class="cards" id="a-cards"></div>
         <div id="a-tablewrap" style="display:none">
           <div class="sheet"><div class="scroll"><table>
-            <thead><tr><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th><th>انتظار الرد من</th><th>ردّت</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th><th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>ردّت</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th><th>إجراءات</th></tr></thead>
             <tbody id="a-body"></tbody></table></div></div>
         </div>
         <div class="empty" id="a-empty">لا توجد مذكرات مطابقة.</div>
@@ -546,6 +590,7 @@ td.reply-cell{min-width:180px}
         <button class="btn ghost sm" id="sp-pull">سحب البيانات من السحابة</button>
         <button class="btn ghost sm" id="sp-export">تصدير نسخة احتياطية</button>
         <button class="btn ghost sm" id="sp-test">فحص الحفظ</button>
+        <button class="btn ghost sm" id="sp-seed">إعادة تحميل بيانات الملفين</button>
         <label class="btn ghost sm" style="margin:0;display:inline-flex;align-items:center;cursor:pointer">استيراد نسخة
           <input id="sp-import" type="file" accept="application/json" style="display:none"></label>
       </div>
@@ -561,6 +606,7 @@ td.reply-cell{min-width:180px}
         <button class="btn ghost sm" data-list="entities">جهات المتابعة</button>
         <button class="btn ghost sm" data-list="units">أقسام الأرشيف</button>
         <button class="btn ghost sm" data-list="senders">الجهات المرسلة</button>
+        <button class="btn ghost sm" data-list="actions">الإجراءات المطلوبة</button>
       </div>
     </div>
   </div>
@@ -587,6 +633,7 @@ td.reply-cell{min-width:180px}
 <div class="toast" id="toast"></div>
 
 <script>
+const SEED={"contacts":[{"name":"نور الدين الخطيب","ext":"0875","mob":"","title":"الأرشيف","dept":"الأرشيف المركزي","sec":""},{"name":"جاسم المرزوقي","ext":"0202","mob":"","title":"","dept":"الأرشيف المركزي","sec":""},{"name":"ناصر العبيدان","ext":"1404","mob":"","title":"موظف الأرشيف","dept":"الأرشيف المركزي","sec":""},{"name":"إبراهيم الزين","ext":"0619","mob":"","title":"","dept":"البحوث","sec":""},{"name":"طه فاضل","ext":"0945","mob":"","title":"","dept":"البحوث","sec":""},{"name":"محمد عماد اهل","ext":"0989","mob":"","title":"سكرتير","dept":"الشؤون الإسلامية","sec":""},{"name":"هيا محمد الهاجري","ext":"2192","mob":"","title":"","dept":"التخطيط","sec":""},{"name":"جاسم عبدالله العلي","ext":"1118","mob":"","title":"مدير","dept":"الدعوة","sec":"الإدارة"},{"name":"فهد دلول","ext":"1144","mob":"55217434","title":"سكرتير","dept":"الدعوة","sec":"الإدارة"},{"name":"مهند محمد","ext":"1155","mob":"","title":"سكرتير","dept":"الدعوة","sec":"الإدارة"},{"name":"جمال العوامي","ext":"1456","mob":"55653161","title":"مالية","dept":"الدعوة","sec":"الإدارة"},{"name":"محمد ديداه","ext":"1140","mob":"55644676","title":"سكرتير","dept":"الدعوة","sec":"الإدارة"},{"name":"الفتوى","ext":"0073","mob":"","title":"","dept":"الدعوة","sec":"الإدارة"},{"name":"محمود المحمدي","ext":"0906","mob":"","title":"","dept":"الدعوة","sec":"الإدارة"},{"name":"سعيد المري","ext":"0775","mob":"55559957","title":"","dept":"الدعوة","sec":"الإدارة"},{"name":"العنود صلاح اليافعي","ext":"4057","mob":"","title":"مكتب المدير","dept":"الدعوة","sec":"الإدارة"},{"name":"حمد الجابر","ext":"2182","mob":"55204342","title":"مسؤول المخازن","dept":"الدعوة","sec":"الإدارة"},{"name":"هشام طيفور","ext":"0548","mob":"","title":"رئيس الدراسات والدعم","dept":"الدعوة","sec":"الإدارة"},{"name":"محمد المرزوقي","ext":"0731","mob":"","title":"","dept":"المساجد","sec":""},{"name":"الاء السلمان","ext":"0993","mob":"","title":"تخطيط","dept":"الدعوة","sec":"الإدارة"},{"name":"منصور الشايمي","ext":"1699","mob":"","title":"مصمم","dept":"الدعوة","sec":"الإدارة"},{"name":"أحمد فودة","ext":"0541","mob":"","title":"مالية","dept":"الدعوة","sec":"الإدارة"},{"name":"ليلى الكلدي","ext":"2126","mob":"","title":"","dept":"مكتب الوكيل","sec":""},{"name":"محمد عثمان","ext":"1411","mob":"","title":"","dept":"مكتب الوكيل","sec":""},{"name":"خالد اليهري","ext":"0732","mob":"","title":"","dept":"مكتب الوكيل المساعد","sec":""},{"name":"علي صقر","ext":"1222","mob":"","title":"","dept":"مكتب الوكيل","sec":""},{"name":"طارق","ext":"2005","mob":"","title":"","dept":"مكتب الوكيل","sec":""},{"name":"نور الدين العسلي","ext":"2101","mob":"","title":"","dept":"مكتب الوكيل","sec":""},{"name":"عبده الصوفي","ext":"2920","mob":"","title":"مالية","dept":"الدعوة","sec":"الإدارة"},{"name":"لولوه \"م.د شون قرآن\"","ext":"0487","mob":"55090403","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"تماضر","ext":"0486","mob":"55548588","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"انتصار","ext":"1939","mob":"","title":"سكرتير","dept":"الدعوة","sec":"قرآن نساء"},{"name":"عواطف","ext":"1768","mob":"","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"خضرة","ext":"439","mob":"","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"حصة النملان","ext":"0439","mob":"","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"شؤون إدارية قرآن","ext":"0363","mob":"","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"مريم عبدالله دحروج","ext":"1821","mob":"","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"مريم حمد المري","ext":"1847","mob":"","title":"سكرتير","dept":"الدعوة","sec":"قرآن نساء"},{"name":"ندى العلي","ext":"44701843","mob":"","title":"","dept":"الدعوة","sec":"قرآن نساء"},{"name":"عائشة الهاجري","ext":"0470","mob":"","title":"بديل لولوه","dept":"الدعوة","sec":"قرآن نساء"},{"name":"وفاء المهيزع","ext":"0362","mob":"55090403","title":"مساعد مدير","dept":"الدعوة","sec":"إداري نسائي"},{"name":"نور الغانم","ext":"0952","mob":"33682866","title":"سكرتير","dept":"الدعوة","sec":"إداري نسائي"},{"name":"نوار \"م.د شون دعوة\"","ext":"0493","mob":"66603666","title":"","dept":"الدعوة","sec":"إداري نسائي"},{"name":"سلمى المري","ext":"1759","mob":"","title":"","dept":"الدعوة","sec":"إداري نسائي"},{"name":"العنود البحر","ext":"1853","mob":"","title":"سكرتير المراكز الاهلية","dept":"الدعوة","sec":"إداري نسائي"},{"name":"فاطمة المنصوري","ext":"1842","mob":"","title":"المراكز الأهلية","dept":"الدعوة","sec":"إداري نسائي"},{"name":"فاطمة العمادي","ext":"0671","mob":"","title":"المراكز الأهلية","dept":"الدعوة","sec":"إداري نسائي"},{"name":"شوق المهيزع","ext":"0674","mob":"","title":"المراكز الأهلية","dept":"الدعوة","sec":"إداري نسائي"},{"name":"نوره الملا","ext":"1906","mob":"","title":"","dept":"الدعوة","sec":"إداري نسائي"},{"name":"شيخة الهاجري","ext":"1905","mob":"","title":"مسولة المراكز الأهلية","dept":"الدعوة","sec":"إداري نسائي"},{"name":"أمل العمادي","ext":"1906","mob":"55851352","title":"","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"نورة الملا","ext":"1860","mob":"","title":"نائب","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"نوار \"م.د شون دعوة\"","ext":"","mob":"","title":"","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"سمية","ext":"3477","mob":"","title":"سكرتيرة","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"فاطمة عمادي","ext":"0561","mob":"","title":"شؤون موظفين","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"العنود جار الله الغفران","ext":"","mob":"","title":"","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"شيخة الهاجري","ext":"1905","mob":"","title":"0671","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"فاطمة منصوري","ext":"1842","mob":"","title":"","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"حنان","ext":"0423","mob":"50050596","title":"","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"العنود الرومي","ext":"","mob":"66860788","title":"","dept":"الدعوة","sec":"إرشاد نساء"},{"name":"زاهر النوش","ext":"2523","mob":"","title":"سكرتير","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"الشيخ عبدالرحمن آل ثاني","ext":"0042","mob":"","title":"رئيس القسم","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"عثمان عبدالجليل","ext":"0884","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"عبدالرحمن بومحمود","ext":"2998","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"فضل الصباحي","ext":"0994","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"فهد الحوصلي","ext":"1150","mob":"","title":"رئيس شعبة","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"يحيى المسقري","ext":"1168","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"القفيلي","ext":"1299","mob":"","title":"","dept":"","sec":""},{"name":"مشعل علي المري","ext":"","mob":"50555014","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"المفتين","ext":"0073","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"عبدالمنعم باكير","ext":"1125","mob":"","title":"رئيس شعبة","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"أبو الليل","ext":"0542","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"يحى الشايمي","ext":"0939","mob":"","title":"","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"ش م السميع","ext":"1123","mob":"","title":"رئيس شعبة المتابعة","dept":"الدعوة","sec":"إرشاد رجال"},{"name":"إبراهيم الدرويش","ext":"1077","mob":"66655722","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"الحمادي","ext":"1147","mob":"55821598","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"مسعود جار الله المري","ext":"1272","mob":"55617159","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"خالد الحمادي","ext":"1077","mob":"77044488","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"مسعود جار الله المري","ext":"1272","mob":"","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"فرج العتيبي","ext":"1071","mob":"55779577","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"عصام مصطفى نبيه","ext":"1813","mob":"66826084","title":"سكرتير","dept":"الدعوة","sec":"طلاب المنح"},{"name":"ع الله الجعيدي","ext":"1078","mob":"55852213","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"مهدي القحطاني","ext":"1086","mob":"","title":"","dept":"الدعوة","sec":"طلاب المنح"},{"name":"أحمد درموش","ext":"1143","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"أسامة توفيق","ext":"2933","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"جمال الريمي","ext":"0572","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"حسن الشهابي","ext":"2942","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"خالد الأهدل","ext":"2960","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"خالد السيد","ext":"2946","mob":"","title":"الشعبة الإدارية","dept":"الدعوة","sec":"قرآن رجال"},{"name":"خلف العيادة","ext":"2923","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"رضا","ext":"1154","mob":"","title":"الشعبة الإدارية","dept":"الدعوة","sec":"قرآن رجال"},{"name":"ع الكريم الحدأ","ext":"2947","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"عبدالعزيز آل ثاني","ext":"0630","mob":"","title":"رئيس شعبة","dept":"الدعوة","sec":"قرآن رجال"},{"name":"عمر نالية","ext":"2924","mob":"77177403","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"نبيل قنوي","ext":"2157","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"فهد المحمد","ext":"0570","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"محمد طاهر","ext":"0975","mob":"","title":"مخزن السد","dept":"الدعوة","sec":"قرآن رجال"},{"name":"محمد عبدالرحمن","ext":"2931","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"محمود حسن صبري","ext":"2952","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"مرغني عثمان","ext":"2939","mob":"","title":"المخزن","dept":"الدعوة","sec":"قرآن رجال"},{"name":"نور الحق","ext":"2943","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"وليد","ext":"1911","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"وليد اليافعي","ext":"1911","mob":"","title":"سكرتير/نظام متبرعين","dept":"الدعوة","sec":"قرآن رجال"},{"name":"يوسف حسن طاهر","ext":"3536","mob":"","title":"","dept":"الدعوة","sec":"قرآن رجال"},{"name":"الراجحي","ext":"1919","mob":"55223802","title":"رئيس قسم","dept":"الدعوة","sec":"اسلام ويب"},{"name":"محسن الكسادي","ext":"0098","mob":"66652223","title":"سكرتير","dept":"الدعوة","sec":"اسلام ويب"},{"name":"خالد حسين الشبراوي","ext":"2066","mob":"","title":"سكرتير","dept":"الدعوة","sec":"اسلام ويب"},{"name":"العباد","ext":"2072","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"اياد","ext":"2023","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"ع أبو موسى","ext":"2030","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"راشد الهاجري","ext":"2018","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"الحوصلي","ext":"2027","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"حارب المنصوري","ext":"","mob":"33431565","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"محمد وفيق","ext":"2048","mob":"77745700","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"البيضاني","ext":"2059","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"نبيل البجلي","ext":"2188","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"د.كمال عكود","ext":"2070","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"أبو عمر عبدالجليل","ext":"","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"عبدالرحمن أبو موسى","ext":"2030","mob":"66665536","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"إسماعيل بكر","ext":"2172","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"ش عبدالرحمن آل ثاني","ext":"2026","mob":"55023302","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"مشعل المري","ext":"1193","mob":"","title":"","dept":"الدعوة","sec":"اسلام ويب"},{"name":"سعد/شعبة الصيانة","ext":"0410.","mob":"","title":"","dept":"الصيانة","sec":""},{"name":"ناصر السليطي","ext":"0900","mob":"","title":"","dept":"العلاقات العامة","sec":""},{"name":"غزيل","ext":"1782","mob":"","title":"","dept":"العلاقات العامة","sec":""},{"name":"بوحسن عبدالحليم","ext":"0883","mob":"","title":"","dept":"العلاقات العامة","sec":""},{"name":"عادل البصيري","ext":"0599","mob":"","title":"سكرتير المدير","dept":"العلاقات العامة","sec":""},{"name":"عبدالعزيز دربان","ext":"2999","mob":"","title":"","dept":"العلاقات العامة","sec":""},{"name":"المعصومي","ext":"0873","mob":"","title":"","dept":"العلاقات العامة","sec":""},{"name":"خالد اليهري","ext":"0732","mob":"","title":"","dept":"المساجد","sec":""},{"name":"إمداد","ext":"0633","mob":"","title":"","dept":"المساجد","sec":""},{"name":"وليد الهلابي","ext":"1141","mob":"","title":"","dept":"المساجد","sec":""},{"name":"سلطان الجعيدي","ext":"1554","mob":"","title":"","dept":"المساجد","sec":""},{"name":"أبو بكر","ext":"1559","mob":"","title":"","dept":"المساجد","sec":""},{"name":"صالح العجي","ext":"1998","mob":"","title":"","dept":"المساجد","sec":""},{"name":"المشتريات/فهد العبدالله","ext":"0371","mob":"","title":"","dept":"المشتريات","sec":"المالية"},{"name":"السميني","ext":"1075","mob":"","title":"","dept":"المشتريات","sec":"المالية"},{"name":"محمد احمد نصار","ext":"0025","mob":"","title":"","dept":"المشتريات","sec":"المالية"},{"name":"محمد العقيلي","ext":"1122","mob":"","title":"0101","dept":"المشتريات","sec":"المالية"},{"name":"عادل بابصيل","ext":"0383","mob":"","title":"","dept":"المشتريات","sec":"المالية"},{"name":"الرويلـــي","ext":"0089","mob":"66936331","title":"رئيس قسم","dept":"الدعوة","sec":"المعهد"},{"name":"رامي خليل","ext":"0573","mob":"","title":"سكرتير","dept":"الدعوة","sec":"المعهد"},{"name":"نواف","ext":"","mob":"77833350","title":"","dept":"الدعوة","sec":"المعهد"},{"name":"جار الله","ext":"1952","mob":"","title":"","dept":"الدعوة","sec":"المعهد"},{"name":"وليد الزراف","ext":"1053","mob":"","title":"","dept":"الدعوة","sec":"المعهد"},{"name":"محمود سالم","ext":"1148","mob":"55216012","title":"","dept":"الدعوة","sec":"المعهد"},{"name":"ع الشيباني","ext":"0051","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"خليفة /رواتب","ext":"0426","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"عثمان محمد الرحماني","ext":"0505","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"حمد يوسف","ext":"0330","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"ناصر العامري","ext":"0949","mob":"","title":"دورات الموظفين","dept":"الموارد البشرية","sec":""},{"name":"محمد المسلم","ext":"0030","mob":"","title":"الحضور والانصراف","dept":"الموارد البشرية","sec":""},{"name":"علي محمد يوسف الحاي","ext":"0773","mob":"","title":"نظام الحضور والانصراف","dept":"الموارد البشرية","sec":""},{"name":"ناصر العامري","ext":"0949","mob":"","title":"تدريب وتطوير موارد","dept":"","sec":""},{"name":"مراد الصبان","ext":"0606","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"حسن العبيدلي","ext":"1166","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"احمد السيد","ext":"0043","mob":"","title":"","dept":"الموارد البشرية","sec":""},{"name":"خالد آل ثاني","ext":"2000","mob":"","title":"","dept":"إدارة الوقف","sec":""},{"name":"سعد عمران","ext":"2020","mob":"","title":"","dept":"إدارة الوقف","sec":""},{"name":"أحمد المحمود","ext":"0800","mob":"","title":"","dept":"إدارة الوقف","sec":""},{"name":"عبدالهادي عبيد","ext":"0600","mob":"","title":"","dept":"إدارة الوقف","sec":""},{"name":"محمد خ الكبيسي","ext":"1333","mob":"","title":"","dept":"إدارة الوقف","sec":""},{"name":"مركز ضيوف قطر","ext":"44444870","mob":"33375570","title":"","dept":"جهات خارجية","sec":""},{"name":"مكيفات الوزارة","ext":"1340","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"بدالة الوزارة","ext":"0650","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"المطبخ 18","ext":"1352","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"المطبخ 19","ext":"2036","mob":"","title":"2037","dept":"خدمات الوزارة","sec":""},{"name":"المطبخ20","ext":"2037","mob":"","title":"2034","dept":"خدمات الوزارة","sec":""},{"name":"الكواري-خدمات","ext":"0666","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"فهد الجعيدي","ext":"0004","mob":"","title":"الهواتف","dept":"خدمات الوزارة","sec":""},{"name":"طاهر عبدالرحمن","ext":"0820","mob":"","title":"دعم الهواتف","dept":"خدمات الوزارة","sec":""},{"name":"الدعم الفني","ext":"0009","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"حسن السنوسي","ext":"0411","mob":"","title":"خدمات الأمن","dept":"خدمات الوزارة","sec":""},{"name":"علاء جرار","ext":"1431","mob":"","title":"","dept":"الشؤون الهندسية","sec":""},{"name":"يعقوب محسن","ext":"","mob":"66276937","title":"مسؤول الأمن","dept":"خدمات الوزارة","sec":""},{"name":"محمد سهران","ext":"0721","mob":"55347560","title":"مسؤول النقليات","dept":"خدمات الوزارة","sec":""},{"name":"عبدالرحمن مندوب النساء","ext":"","mob":"55761494","title":"","dept":"خدمات الوزارة","sec":""},{"name":"علي فيصل","ext":"0824","mob":"","title":"","dept":"الشؤون الهندسية","sec":""},{"name":"محمد بشير","ext":"0832","mob":"","title":"","dept":"الشؤون الهندسية","sec":""},{"name":"بلال","ext":"1007","mob":"","title":"الكهرباء دعم فني","dept":"خدمات الوزارة","sec":""},{"name":"البوفية - المطعم","ext":"1200","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"استقبال الجمهور","ext":"0065","mob":"","title":"","dept":"خدمات الوزارة","sec":""},{"name":"حسن الملا","ext":"0700","mob":"","title":"","dept":"مكتب الوزير","sec":""},{"name":"يوسف الملا","ext":"0088","mob":"","title":"","dept":"مكتب الوزير","sec":""},{"name":"محمد المحمود","ext":"0286","mob":"","title":"","dept":"مكتب الوزير","sec":""},{"name":"عبدالرحمن المحنا","ext":"0008","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"توفيق اليافعي","ext":"1010","mob":"","title":"سكرتير المدير","dept":"نظم المعلومات","sec":""},{"name":"اشرف","ext":"0091","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"سيد","ext":"0792","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"الحلبوني","ext":"0358","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"م تامر","ext":"","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"إبراهيم فاضل","ext":"0303","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"رشاد","ext":"0438","mob":"","title":"الشبكات","dept":"نظم المعلومات","sec":""},{"name":"إيهاب السني","ext":"0332","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"محمد عبدالحميد","ext":"0613","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"محمود جبرتي","ext":"0334","mob":"66869752","title":"","dept":"نظم المعلومات","sec":""},{"name":"محمد الأمين","ext":"0308","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"حمزة","ext":"0307","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"وضاح","ext":"0100","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"الدعم الفني","ext":"0009","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"محمد الطاهر-حاسب آلي","ext":"","mob":"55338818","title":"","dept":"نظم المعلومات","sec":""},{"name":"عبدالكريم ناصر السعدي","ext":"0335","mob":"55903374","title":"","dept":"نظم المعلومات","sec":""},{"name":"محمد عمر/الطابعات","ext":"0613","mob":"","title":"","dept":"نظم المعلومات","sec":""},{"name":"نور المناعي","ext":"","mob":"","title":"","dept":"","sec":""},{"name":"عبدالله طيفور","ext":"0444","mob":"","title":"","dept":"","sec":""},{"name":"المحمود","ext":"1100","mob":"","title":"","dept":"","sec":""},{"name":"مريم العمادي","ext":"1975","mob":"55556526","title":"","dept":"","sec":""},{"name":"آمنه","ext":"0355","mob":"","title":"الدورات","dept":"الموارد البشرية","sec":""},{"name":"موزة شاهين الغانم","ext":"0385","mob":"","title":"","dept":"","sec":""},{"name":"مريم","ext":"0128","mob":"","title":"الدورات","dept":"الموارد البشرية","sec":""},{"name":"أحمد موظف البدالة","ext":"0433","mob":"","title":"","dept":"خدمات الوزارة","sec":""}],"depts":[{"name":"الأرشيف المركزي","secs":[]},{"name":"البحوث","secs":[]},{"name":"الشؤون الإسلامية","secs":[]},{"name":"التخطيط","secs":[]},{"name":"الدعوة","secs":["الإدارة","قرآن نساء","إداري نسائي","إرشاد نساء","إرشاد رجال","طلاب المنح","قرآن رجال","اسلام ويب","المعهد"]},{"name":"المساجد","secs":[]},{"name":"مكتب الوكيل","secs":[]},{"name":"مكتب الوكيل المساعد","secs":[]},{"name":"الصيانة","secs":[]},{"name":"العلاقات العامة","secs":[]},{"name":"المشتريات","secs":["المالية"]},{"name":"الموارد البشرية","secs":[]},{"name":"إدارة الوقف","secs":[]},{"name":"جهات خارجية","secs":[]},{"name":"خدمات الوزارة","secs":[]},{"name":"الشؤون الهندسية","secs":[]},{"name":"مكتب الوزير","secs":[]},{"name":"نظم المعلومات","secs":[]}],"memos":[{"no":"106512","ref":"4856","title":"دعوة لمشاركة وفد في فعاليات مشروع الزواج الجماعي ومسابقة القرآن الكريم في جمهورية بوروندي","date":"2026-08-04","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"103414","ref":"4842","title":"اعداد دليل لاجراءات وضوابط إتلاف المصاحف والكتب والمطويات الدينية في الدولة","date":"2026-08-03","senders":[],"sender":"","action":"أخرى","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"103031","ref":"4826","title":"تكليف موظفين لتغطية ندوة التكامل المعرفي الأولى للموسم الثالث","date":"2026-07-29","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"103034","ref":"4825","title":"تكليف موظفين لتغطية ندوة التكامل المعرفي الأولى للموسم الثالث","date":"2026-07-29","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"103465","ref":"4816","title":"تعبئة \"الإنجاز الفعلي\" في المراجعة النصف سنوية لمنظومة أداء الأهداف المؤسسية","date":"2026-07-29","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"102400","ref":"4809","title":"مشروع محفظي المنازل ( رجال )","date":"2026-07-28","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"100188","ref":"4749","title":"موعد تسليم ملف مشروع موازنة 2027م وما بعدها","date":"2026-07-25","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"92024","ref":"4624","title":"مشروع ورشة تدريبية للأئمة والخطباء بعنوان الخطيب والنمو الإيماني. ومشروع الخطيب الواعد 2026م","date":"2026-07-04","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"90675","ref":"4620","title":"استيعاب السيد / مختار عبدالله محمد مكرد للعمل لدى إدارة الدعوة والإرشاد الديني","date":"2026-07-01","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"57311","ref":"4598","title":"السعودية - مسابقة الملك عبدالعزيز لحفظ القرآن (2026/0063790/5)","date":"2026-06-28","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"89177","ref":"4597","title":"بشأن حضور الحفل الختامي وتحديد موعده لمسابقة الشيخ جاسم - فرع رفقاء","date":"2026-06-28","senders":[],"sender":"","action":"للمراجعة","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"44423","ref":"4563","title":"النسخة الثانية من \"مؤتمر قيادة - تطلعات وتنمية الشباب المسلم 2026\"","date":"2026-06-23","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"42058","ref":"4557","title":"حلقات تحفيظ القرآن داخل مساجد في منطقة الخزامى - لوسيل - مركز آل حنزاب للقرآن الكريم وعلومه","date":"2026-06-23","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"37820","ref":"4556","title":"السعودية - مسابقة الملك عبدالعزيز لحفظ القرآن (2026/0044464/5)","date":"2026-06-23","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"82673","ref":"4512","title":"ترشيح طلاب جدد للدراسة في المعهد الديني","date":"2026-06-17","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"83177","ref":"4503","title":"تقرير متابعة الأداء العام وإنجازات الإدارات عن الربع الثاني لعام 2026م","date":"2026-06-16","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"81061","ref":"4457","title":"خطة صرف مخصصات 2026م بعد التخفيض - إدارة الدعوة والإرشاد الديني","date":"2026-06-13","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"65963","ref":"4403","title":"بشان مشروع تحديث اجهزة الحاسب الالي لإدارة الدعوة - متطلبات الامن السيبراني","date":"2026-06-05","senders":[],"sender":"","action":"أخرى","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"46811","ref":"4369","title":"باكستان - طلب تسجيل أبناء نائب رئيس البعثة في مراكز تحفيظ القرآن الكريم (2026/0052762/5)","date":"2026-06-01","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"74142","ref":"4368","title":"رفع تقارير دورية ربع سنوية تتضمن إنجازات الوزارة فيما يتعلق بالأشخاص ذوي الإعاقة وترشيح موظف كنقطة اتصال","date":"2026-06-01","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"41768","ref":"4298","title":"مسابقة الدولية السادسة والستين 66 لتلاوة القرآن الكريم وحفظه لعام 1448ه- 2026 خلال الفترة 4-10 أكتوبر 2026. آخر أجل لتقديم الطلب قبل التاريخ 2 يونيو 2026 (2026/0048589/5)","date":"2026-05-18","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"47612","ref":"3919","title":"قياس مؤشرات الأداء التشغيلية الخاصة بإدارة الدعوة والإرشاد الديني لعام 2025","date":"2026-04-09","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"43722","ref":"3822","title":"احالة: طلب السيد/ محمد محمود الزين، للعمل كواعظ شرعي","date":"2026-04-02","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"40722","ref":"3783","title":"التقرير التعقيبي لجائزة قطر للتميز الحكومي للنسخة الثانية 2025.","date":"2026-03-30","senders":[],"sender":"","action":"لإجراء اللازم حسب المتبع","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"27006","ref":"3529","title":"برنامج تدريبي لتنمية المهارات الدعوية (مركز الخليج لخدمات الاستشارات النفسية والأسرية)","date":"2026-02-16","senders":[],"sender":"","action":"لإجراء اللازم","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"9547","ref":"3398","title":"فتح مركز تحفيظ قرآن في مسجد رقم (1242) بمنطقة الخيسة","date":"2026-02-02","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"1581","ref":"3213","title":"الاجتماع (الحادي عشر) مركز النور القرآني التربوي","date":"2026-01-07","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"742812","ref":"3125","title":"أهمية توظيف الذكاء الإصطناعي في مجال الشؤون الإسلامية","date":"2025-12-25","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"190098","ref":"3086","title":"طلب صرف مكافآت للمكلفين بأعمال إضافية من وفورات رواتب إدارة الدعوة والإرشاد الديني","date":"2025-12-22","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}},{"no":"685035","ref":"1630","title":"مركز لتحفيظ القرآن بمسجد العنود بنت محمد بن عبدالعزيز آل ثاني","date":"2025-06-26","senders":[],"sender":"","action":"لرفع الإفادة لمكتب سعادة الوزير","actionOther":"","done":false,"doneNo":"","waiting":["إدارة الدعوة والإرشاد الديني"],"follow":[],"replies":{}}],"units":["مكتب وكيل الوزارة المساعد لشؤون الدعوة والمساجد","إدارة الدعوة والإرشاد الديني","إدارة التدقيق الداخلي","إدارة التخطيط والجودة والابتكار","إدارة الشؤون القانونية","إدارة نظم المعلومات","إدارة المساجد","إدارة الشؤون الإسلامية","قسم العلاقات الإسلامية"],"actions":["لإجراء اللازم حسب المتبع","أخرى","لرفع الإفادة لمكتب سعادة الوزير","للمراجعة","لإجراء اللازم"]};
 /* ================= التخزين ================= */
 const mem={};
 const LS=(()=>{try{const t="__t";localStorage.setItem(t,"1");localStorage.removeItem(t);return localStorage}catch(e){return null}})();
@@ -617,7 +664,9 @@ const DB={contacts:[],mails:[],tasks:[],seq:1,
     roles:["مدير","سكرتارية","موظف"],
     entities:[{name:"الشؤون الإدارية",dept:"الشؤون الإدارية",sec:"الاتصالات",phone:"0500000000"}],
     units:["الشؤون الإدارية","الشؤون المالية","تقنية المعلومات","الموارد البشرية","الشؤون القانونية"],
-    senders:["مكتب الوكيل","الأرشيف المركزي","الإدارة العامة"]},
+    senders:["مكتب الوكيل","الأرشيف المركزي","الإدارة العامة"],
+    follow:[],
+    actions:["لإجراء اللازم","لإجراء اللازم حسب المطلوب","لرفع الإفادة لمكتب سعادة الوزير","أخرى"]},
   memos:[],
   settings:{appName:"الوصل",appTag:"الدليل · المراسلات · المهام",logo:null,current:1,admin:{u:"admin",p:"admin"}},
   users:[{id:1,name:"مدير النظام",job:"مسؤول",perms:{dir:1,mail:1,tasks:1,arch:1,stats:1,settings:1}}]};
@@ -675,7 +724,7 @@ function applyPerms(){
 
 /* ================= القوائم المنسدلة ================= */
 let LIST_KEY=null,LIST_IDX=-1;
-const LIST_LABEL={titles:"الصفات",depts:"الإدارات وأقسامها",roles:"صفات المراسلة",entities:"جهات المتابعة",units:"أقسام الأرشيف",senders:"الجهات المرسلة"};
+const LIST_LABEL={titles:"الصفات",depts:"الإدارات وأقسامها",roles:"صفات المراسلة",entities:"جهات المتابعة",units:"أقسام الأرشيف",senders:"الجهات المرسلة",actions:"الإجراءات المطلوبة"};
 function field(id,label,type){const d=el("div");const l=el("label",null,label);l.htmlFor=id;
   const i=document.createElement("input");i.id=id;if(type)i.type=type;d.appendChild(l);d.appendChild(i);return d}
 function plainSelect(id,label,key){const d=el("div");const l=el("label",null,label);l.htmlFor=id;d.appendChild(l);
@@ -869,12 +918,15 @@ function openRec(kind,rec){
     g.appendChild(field("r-name","الاسم"));g.appendChild(field("r-ext","الخط"));g.appendChild(field("r-mob","الجوال"));
     g.appendChild(selectField("r-title","الصفة","titles",rec&&rec.title));
     deptPair(g,"r-dept","r-sec","الإدارة","القسم",rec&&rec.dept,rec&&rec.sec);
-    if(rec){$("#r-name").value=rec.name;$("#r-ext").value=rec.ext||"";$("#r-mob").value=rec.mob||""}
+    if(rec){$("#r-name").value=rec.name;$("#r-ext").value=rec.ext||"";$("#r-mob").value=rec.mob||"";
+      $("#r-email").value=rec.email||""}
   }
   if(kind==="mail"){
     $("#rec-title").textContent=rec?"تعديل مراسلة":"إضافة مراسلة";
     g.appendChild(field("r-name","الاسم"));
-    deptPair(g,"r-dept","r-sec","الإدارة","القسم",rec&&rec.dept,rec&&rec.sec);
+    deptPair(g,"r-dept","r-sec","الإدارة","القسم",(rec&&rec.dept)||DAWA,rec&&rec.sec);
+    fillDawaDept($("#r-dept"),(rec&&rec.dept)||DAWA);
+    fillSecSelect($("#r-sec"),(rec&&rec.dept)||DAWA,(rec&&rec.sec)||"");
     g.appendChild(field("r-mail","الإيميل","email"));
     g.appendChild(selectField("r-role","الصفة","roles",rec&&rec.role));
     if(rec){$("#r-name").value=rec.name;$("#r-mail").value=rec.email||""}
@@ -902,18 +954,25 @@ function openRec(kind,rec){
 function readRec(){
   if(REC_KIND==="contact"){const ds=readDS("r-dept","r-sec");
     return{name:$("#r-name").value.trim(),ext:$("#r-ext").value.trim(),mob:$("#r-mob").value.trim(),
-      title:$("#r-title").value,dept:ds.dept,sec:ds.sec}}
+      email:($("#r-email").value||"").trim(),title:$("#r-title").value,dept:ds.dept,sec:ds.sec}}
   if(REC_KIND==="mail"){const ds=readDS("r-dept","r-sec");
     return{name:$("#r-name").value.trim(),dept:ds.dept,sec:ds.sec,
       email:$("#r-mail").value.trim(),role:$("#r-role").value}}
   return{type:$("#r-type").value,title:$("#r-title2").value.trim(),start:$("#r-start").value,due:$("#r-due").value,
     prio:$("#r-prio").value,entity:$("#r-entity").value,phone:$("#r-phone").value.trim(),det:$("#r-det").value.trim()};
 }
+async function saveEverything(){
+  await save("dir:contacts",DB.contacts);await save("dir:mails",DB.mails);
+  await save("dir:memos",DB.memos);await save("dir:lists",DB.lists);
+  await save("dir:users",DB.users);await save("dir:settings",DB.settings);
+  await save("dir:tasks",{list:DB.tasks,seq:DB.seq});
+}
 async function persist(){
   if(REC_KIND==="memo")await save("dir:memos",DB.memos);
   else if(REC_KIND==="contact")await save("dir:contacts",DB.contacts);
   else if(REC_KIND==="mail")await save("dir:mails",DB.mails);
   else await save("dir:tasks",{list:DB.tasks,seq:DB.seq});
+  await saveEverything();
   renderAll();
 }
 $("#rec-save").onclick=async()=>{
@@ -929,6 +988,7 @@ $("#rec-save").onclick=async()=>{
 };
 $("#rec-update").onclick=async()=>{
   if(!REC_ID)return toast("لا يوجد سجل مفتوح للتعديل");
+  if(REC_KIND==="memo"&&window.__follow)void 0;
   if(REC_KIND==="memo"){const i=DB.memos.findIndex(x=>x.id===REC_ID);if(i<0)return;
     DB.memos[i]=Object.assign(DB.memos[i],readMemo());
     await persist();$("#ov-rec").classList.remove("on");return toast("حُدّثت المذكرة")}
@@ -1005,31 +1065,98 @@ $("#u-apply").onclick=async()=>{
   renderUsers();applyPerms();toast("حُدّث المستخدم");
 };
 
+
+/* ===== فلاتر الإدارة/القسم في كل الصفحات ===== */
+function initFilters(){
+  if($("#m-fd")&&!$("#m-fd").dataset.dw){$("#m-fd").dataset.dw="1";fillDawaDept($("#m-fd"),"");$("#m-fd").value=""}
+  if($("#a-fd")&&!$("#a-fd").dataset.dw){$("#a-fd").dataset.dw="1";fillDawaDept($("#a-fd"),"");$("#a-fd").value=""}
+  [["c",renderContacts],["m",renderMails],["a",renderMemos]].forEach(([k,fn])=>{
+    const d=$("#"+k+"-fd"),sc=$("#"+k+"-fs");
+    if(!d||d.dataset.init)return;d.dataset.init="1";
+    d.addEventListener("change",()=>{fillSecSelect(sc,d.value,"");fn()});
+    sc.addEventListener("change",fn);
+  });
+}
+function matchDS(rec,k){
+  const d=$("#"+k+"-fd"),sc=$("#"+k+"-fs");
+  if(d&&d.value&&rec.dept!==d.value)return false;
+  if(sc&&sc.value&&rec.sec!==sc.value)return false;
+  return true;
+}
+
 /* ================= الدليل ================= */
 $("#c-search").oninput=renderContacts;
+$("#c-all").onchange=async e=>{
+  const on=e.target.checked;
+  const ids=[...document.querySelectorAll(".c-pick")].map(x=>x.dataset.id);
+  for(const id of ids){const c=DB.contacts.find(x=>String(x.id)===id);if(c&&c.email)await toMail(c,on)}
+  toast(on?"نُقلت السجلات المحددة":"أُزيلت من المراسلات");
+};
+$("#c-to-mail").onclick=async()=>{
+  const picked=[...document.querySelectorAll(".c-pick:checked")].map(x=>x.dataset.id);
+  if(!picked.length)return toast("حدّد سجلًا واحدًا على الأقل");
+  let n=0;
+  for(const id of picked){const c=DB.contacts.find(x=>String(x.id)===id);
+    if(c&&c.email&&!DB.mails.some(y=>y.email===c.email)){await toMail(c,true);n++}}
+  toast(n?("نُقل "+n+" سجل إلى المراسلات"):"السجلات المحددة موجودة مسبقًا");
+};
 function renderContacts(){
   const q=$("#c-search").value.trim();
-  const rows=DB.contacts.filter(c=>!q||[c.name,c.dept,c.sec,c.ext,c.mob,c.title].join(" ").includes(q));
+  const rows=DB.contacts.filter(c=>matchDS(c,"c")).filter(c=>!q||[c.name,c.dept,c.sec,c.ext,c.mob,c.title].join(" ").includes(q));
   const b=$("#c-body");b.innerHTML="";
   rows.forEach((c,i)=>{
-    const tr=el("tr");tr.appendChild(numCell(i+1));
+    const tr=el("tr");
+    const tc=el("td");const cb=document.createElement("input");cb.type="checkbox";cb.style.width="auto";
+    cb.className="c-pick";cb.dataset.id=c.id;cb.checked=DB.mails.some(x=>x.email&&x.email===c.email);
+    cb.onchange=async e=>{await toMail(c,e.target.checked)};
+    tc.appendChild(cb);tr.appendChild(tc);
+    tr.appendChild(numCell(i+1));
     tr.appendChild(el("td",null,c.name));
     tr.appendChild(numCell(c.ext));tr.appendChild(numCell(c.mob));
+    const em=el("td",null,c.email||"—");em.style.direction="ltr";em.style.textAlign="right";tr.appendChild(em);
     [c.title,c.dept,c.sec].forEach(v=>tr.appendChild(el("td",null,v||"—")));
     const td=el("td","rowtools");
-    const e=el("button","btn sm","تعديل");e.onclick=()=>openRec("contact",c);
-    const d=el("button","btn danger sm","حذف");
+    const mb=el("button","icon-only");mb.title="إضافة إلى المراسلات";
+    mb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>';
+    mb.onclick=async()=>{
+      if(!c.email)return toast("لا يوجد بريد إلكتروني لهذا السجل — أضفه أولًا");
+      if(DB.mails.some(x=>x.email===c.email))return toast("موجود مسبقًا في المراسلات");
+      DB.mails.push({id:Date.now(),name:c.name,dept:c.dept,sec:c.sec,email:c.email,role:c.title||"موظف"});
+      await save("dir:mails",DB.mails);renderAll();toast("أُضيف إلى المراسلات");
+    };
+    const e=el("button","icon-only");e.title="تعديل";
+    e.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+    e.onclick=()=>openRec("contact",c);
+    const d=el("button","icon-only");d.title="حذف";d.style.color="var(--late)";d.style.borderColor="#EFCBD0";
+    d.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
     d.onclick=async()=>{DB.contacts=DB.contacts.filter(x=>x.id!==c.id);await save("dir:contacts",DB.contacts);renderAll();toast("حُذف الرقم")};
-    td.appendChild(e);td.appendChild(d);tr.appendChild(td);b.appendChild(tr);
+    td.appendChild(mb);td.appendChild(e);td.appendChild(d);tr.appendChild(td);b.appendChild(tr);
   });
   $("#c-empty").style.display=rows.length?"none":"block";
   $("#c-count").textContent=DB.contacts.length?"العدد: "+rows.length+" من "+DB.contacts.length:"";
 }
 
+
+/* ===== نقل بيانات الدليل إلى المراسلات ===== */
+async function toMail(c,on){
+  if(on){
+    if(!c.email)return toast("لا يوجد بريد إلكتروني للسجل: "+c.name);
+    if(!DB.mails.some(x=>x.email===c.email))
+      DB.mails.push({id:Date.now()+Math.floor(Math.random()*999),name:c.name,dept:c.dept,sec:c.sec,
+        email:c.email,role:c.title||"موظف",ext:c.ext||"",mob:c.mob||""});
+  }else{
+    DB.mails=DB.mails.filter(x=>x.email!==c.email);
+  }
+  await save("dir:mails",DB.mails);renderAll();
+}
+
 /* ================= المراسلات ================= */
 function renderMails(){
   const b=$("#m-body");b.innerHTML="";
-  DB.mails.forEach((m,i)=>{
+  const qm=($("#m-search")&&$("#m-search").value.trim())||"";
+  DB.mails.filter(m=>matchDS(m,"m"))
+    .filter(m=>!qm||[m.name,m.email,m.dept,m.sec,m.role].join(" ").includes(qm))
+    .forEach((m,i)=>{
     const tr=el("tr");
     const tc=el("td");const cb=document.createElement("input");cb.type="checkbox";cb.style.width="auto";
     cb.dataset.id=m.id;cb.onchange=summary;tc.appendChild(cb);tr.appendChild(tc);
@@ -1038,6 +1165,7 @@ function renderMails(){
     tr.appendChild(el("td",null,m.dept||"—"));
     tr.appendChild(el("td",null,m.sec||"—"));
     const em=el("td");em.style.direction="ltr";em.style.textAlign="right";em.textContent=m.email;tr.appendChild(em);
+    tr.appendChild(numCell(m.ext));tr.appendChild(numCell(m.mob));
     const rl=el("td");rl.appendChild(el("span","pill",m.role||"—"));tr.appendChild(rl);
     const td=el("td","rowtools");
     const e=el("button","btn sm","تعديل");e.style.background="var(--blue)";e.style.borderColor="var(--blue)";e.onclick=()=>openRec("mail",m);
@@ -1045,23 +1173,25 @@ function renderMails(){
     d.onclick=async()=>{DB.mails=DB.mails.filter(x=>x.id!==m.id);await save("dir:mails",DB.mails);renderAll();toast("حُذف البريد")};
     td.appendChild(e);td.appendChild(d);tr.appendChild(td);b.appendChild(tr);
   });
-  $("#m-empty").style.display=DB.mails.length?"none":"block";summary();
+  $("#m-empty").style.display=b.children.length?"none":"block";summary();
 }
 const boxes=()=>[...document.querySelectorAll("#m-body input[type=checkbox]")];
 function setSel(f){boxes().forEach(b=>{const m=DB.mails.find(x=>x.id==b.dataset.id);b.checked=f(m)});summary()}
 $("#sel-all").onclick=()=>setSel(()=>true);
 $("#sel-none").onclick=()=>setSel(()=>false);
-$("#sel-mgr").onclick=()=>setSel(m=>m.role==="مدير");
+$("#sel-mgr").onclick=()=>setSel(m=>/مدير|رئيس قسم/.test(m.role||""));
 $("#sel-sec").onclick=()=>setSel(m=>m.role==="سكرتارية");
 $("#cc-mgr").onchange=summary;
+if($("#m-search"))$("#m-search").oninput=renderMails;
 function picked(){
   const ids=boxes().filter(b=>b.checked).map(b=>b.dataset.id);
   let to=DB.mails.filter(m=>ids.includes(String(m.id))),cc=[];
-  if($("#cc-mgr").checked){cc=DB.mails.filter(m=>m.role==="مدير");to=to.filter(m=>m.role!=="مدير")}
+  const isMgr=m=>/مدير|رئيس قسم|رئيس/.test(m.role||"");
+  if($("#cc-mgr").checked){cc=DB.mails.filter(isMgr);to=to.filter(m=>!isMgr(m))}
   return{to,cc};
 }
 function summary(){const{to,cc}=picked();
-  $("#m-summary").textContent=(to.length||cc.length)?"إلى: "+to.length+" · نسخة للمدراء: "+cc.length:"لم يتم تحديد أي مستلم."}
+  $("#m-summary").textContent=(to.length||cc.length)?"إلى: "+to.length+" · نسخة للمدراء ورؤساء الأقسام: "+cc.length:"لم يتم تحديد أي مستلم."}
 $("#send").onclick=()=>{
   const{to,cc}=picked();if(!to.length&&!cc.length)return toast("حدّد مستلمًا واحدًا على الأقل");
   const url="mailto:"+to.map(m=>m.email).join(",")+"?cc="+encodeURIComponent(cc.map(m=>m.email).join(","))
@@ -1186,13 +1316,41 @@ function openMemo(m){
   $("#rec-title").textContent=m?"تعديل مذكرة":"إضافة مذكرة";
   $("#rec-note").textContent=m?"وضع التعديل — استخدم «تحديث»":"مذكرة جديدة — استخدم «حفظ»";
   REC_KIND="memo";REC_ID=MEMO_ID;
-  g.appendChild(field("a-no","رقم المذكرة"));
+  g.appendChild(field("a-no","رقم المذكرة (رقم الكتاب)"));
   g.appendChild(field("a-title","العنوان"));
   g.appendChild(field("a-date","التاريخ","date"));
-  g.appendChild(selectField("a-sender","الجهة المرسلة","senders",m&&m.sender));
+  /* الإجراء المطلوب — قائمة منسدلة قابلة للزيادة */
+  g.appendChild(selectField("a-action","الإجراء المطلوب","actions",m&&m.action));
+  const othW=field("a-action-oth","تفاصيل «أخرى»");g.appendChild(othW);
+  const togOth=()=>{const av=$("#a-action");othW.style.display=(av&&av.value==="أخرى")?"":"none"};
   const stt=el("div");stt.innerHTML='<label for="a-state">الحالة</label><select id="a-state"><option value="open">تحت المتابعة</option><option value="done">أنجزت</option></select>';
   g.appendChild(stt);
   const doneWrap=field("a-donno","رقم مذكرة الإنجاز");g.appendChild(doneWrap);
+  /* الجهة المرسلة — مربعات اختيار متعددة */
+  const sw=el("div","full");
+  const shd=el("div");shd.style.display="flex";shd.style.alignItems="center";shd.style.gap="8px";
+  const slb=el("label",null,"الجهة المرسلة (يمكن اختيار أكثر من جهة)");slb.style.margin="0";slb.style.flex="1";shd.appendChild(slb);
+  const sadd=el("button","btn ghost sm","إضافة جهة");sadd.type="button";
+  sadd.onclick=async()=>{const n=prompt("اسم الجهة المرسلة:");if(!n)return;const v=n.trim();
+    if(!v||DB.lists.senders.includes(v))return;DB.lists.senders.push(v);
+    await save("dir:lists",DB.lists);drawSenders();toast("أُضيفت الجهة")};
+  const sedit=el("button","btn ghost sm","تعديل الجهات");sedit.type="button";sedit.onclick=()=>openList("senders");
+  shd.appendChild(sadd);shd.appendChild(sedit);sw.appendChild(shd);
+  const sbox=el("div","deptbox");sbox.id="a-senders";sw.appendChild(sbox);
+  g.appendChild(sw);
+  const preSenders=m?(Array.isArray(m.senders)?m.senders:(m.sender?[m.sender]:[])):[];
+  function drawSenders(){
+    const chosen=[...sbox.querySelectorAll("input:checked")].map(c=>c.value);
+    sbox.innerHTML="";
+    DB.lists.senders.forEach(u=>{
+      const l=el("label","deptpick");
+      const c=document.createElement("input");c.type="checkbox";c.value=u;
+      if(chosen.length?chosen.includes(u):preSenders.includes(u))c.checked=true;
+      l.appendChild(c);l.appendChild(document.createTextNode(u));sbox.appendChild(l);
+    });
+  }
+  drawSenders();
+
   const wrap=el("div","full");
   const hd=el("div");hd.style.display="flex";hd.style.alignItems="center";hd.style.gap="8px";
   const lb=el("label",null,"انتظار الرد من (اختر الأقسام)");lb.style.margin="0";lb.style.flex="1";hd.appendChild(lb);
@@ -1205,6 +1363,67 @@ function openMemo(m){
   hd.appendChild(addb);hd.appendChild(edb);wrap.appendChild(hd);
   const box=el("div","deptbox");box.id="a-units";wrap.appendChild(box);
   g.appendChild(wrap);
+
+  /* المتابعة مع أقسام إدارة الدعوة — مربعات اختيار متعددة */
+  const fw=el("div","full");
+  const fhd=el("div");fhd.style.display="flex";fhd.style.alignItems="center";fhd.style.gap="8px";
+  const flb=el("label",null,"المتابعة مع (أقسام إدارة الدعوة والإرشاد الديني)");flb.style.margin="0";flb.style.flex="1";
+  fhd.appendChild(flb);
+  const fadd=el("button","btn ghost sm","إضافة قسم");fadd.type="button";
+  fadd.onclick=async()=>{const n=prompt("اسم القسم الجديد:");if(!n)return;const v=n.trim();if(!v)return;
+    let d=(DB.lists.depts||[]).find(x=>x.name===DAWA);
+    if(!d){d={name:DAWA,secs:[]};DB.lists.depts.push(d)}
+    if(!d.secs)d.secs=[];
+    if(!d.secs.includes(v))d.secs.push(v);
+    await save("dir:lists",DB.lists);drawFollow();toast("أُضيف القسم")};
+  fhd.appendChild(fadd);fw.appendChild(fhd);
+  const fbox=el("div","deptbox");fbox.id="a-follow";fw.appendChild(fbox);
+  g.appendChild(fw);
+  let follow=m&&Array.isArray(m.follow)?m.follow.slice():[];
+  window.__follow=follow;
+  function drawFollow(){
+    const chosen=[...fbox.querySelectorAll("input:checked")].map(c=>c.value);
+    fbox.innerHTML="";
+    const secs=deptSecs(DAWA);
+    if(!secs.length)fbox.appendChild(el("div","mini","لا توجد أقسام — أضف قسمًا."));
+    secs.forEach(sc=>{
+      const l=el("label","deptpick");
+      const c=document.createElement("input");c.type="checkbox";c.value=sc;
+      c.checked=chosen.length?chosen.includes(sc):follow.some(f=>f.sec===sc);
+      c.onchange=()=>{
+        window.__follow=[...fbox.querySelectorAll("input:checked")].map(x=>({dept:DAWA,sec:x.value}));
+      };
+      l.appendChild(c);l.appendChild(document.createTextNode(sc));
+      const r=m&&m.replies&&m.replies["@"+DAWA+" — "+sc];
+      if(r&&r.ok){l.style.background="var(--ok-bg)";l.style.borderColor="#BFE0D2";
+        l.appendChild(el("span","tick","✓"))}
+      fbox.appendChild(l);
+    });
+    window.__follow=[...fbox.querySelectorAll("input:checked")].map(x=>({dept:DAWA,sec:x.value}));
+  }
+  drawFollow();
+
+  /* ردود الأقسام التي ردّت — للعرض */
+  const rv=el("div","full");rv.id="a-replies-view";g.appendChild(rv);
+  function drawReplies(){
+    rv.innerHTML="";
+    const list=[];
+    (m&&m.waiting||[]).forEach(u=>{const r=m.replies&&m.replies[u];if(r&&r.ok)list.push([u,r])});
+    (m&&m.follow||[]).forEach(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;
+      const r=m.replies&&m.replies["@"+nm];if(r&&r.ok)list.push([nm,r])});
+    if(!list.length)return;
+    rv.appendChild(el("label",null,"الردود الواردة"));
+    list.forEach(([nm,r])=>{
+      const bx=el("div","replybox done");
+      const hd2=el("div","hd");hd2.appendChild(el("span","tick","✓"));
+      hd2.appendChild(el("span",null,nm));
+      if(r.date)hd2.appendChild(el("span","mini",fmt(r.date)));
+      bx.appendChild(hd2);
+      bx.appendChild(el("div",null,r.text||"— بدون نص —"));
+      rv.appendChild(bx);
+    });
+  }
+  if(m)drawReplies();
   function drawUnits(){
     const chosen=[...box.querySelectorAll("input:checked")].map(c=>c.value);
     box.innerHTML="";
@@ -1221,28 +1440,36 @@ function openMemo(m){
   /* رقم مذكرة الإنجاز يظهر فقط عند اختيار «أنجزت» */
   const toggleDone=()=>{doneWrap.style.display=$("#a-state").value==="done"?"":"none"};
   $("#a-state").onchange=toggleDone;toggleDone();
+  if($("#a-action"))$("#a-action").onchange=togOth;
   if(m){$("#a-no").value=m.no||"";$("#a-title").value=m.title||"";$("#a-date").value=m.date||"";
-    $("#a-state").value=m.done?"done":"open";$("#a-donno").value=m.doneNo||""}
+    $("#a-state").value=m.done?"done":"open";$("#a-donno").value=m.doneNo||"";
+    $("#a-action-oth").value=m.actionOther||""}
   else $("#a-date").value=new Date().toISOString().slice(0,10);
+  togOth();
   $("#ov-rec").classList.add("on");
 }
 function readMemo(){
+  const senders=[...document.querySelectorAll("#a-senders input:checked")].map(c=>c.value);
   return{no:$("#a-no").value.trim(),title:$("#a-title").value.trim(),date:$("#a-date").value,
-    sender:$("#a-sender").value,done:$("#a-state").value==="done",doneNo:$("#a-donno").value.trim(),
+    senders,sender:senders.join("، "),
+    action:$("#a-action").value,actionOther:($("#a-action-oth").value||"").trim(),
+    follow:(window.__follow||[]).slice(),
+    done:$("#a-state").value==="done",doneNo:$("#a-donno").value.trim(),
     waiting:[...document.querySelectorAll("#a-units input:checked")].map(c=>c.value)};
 }
 function openReplies(m){
   const b=$("#rep-body");b.innerHTML="";
   $("#rep-title").textContent="ردود الأقسام · مذكرة "+(m.no||"");
-  const w=m.waiting||[];
-  if(!w.length){b.appendChild(el("div","empty","لم يتم اختيار أقسام لهذه المذكرة."));}
+  const fol=(m.follow||[]).map(f=>"@"+(f.sec?f.dept+" — "+f.sec:f.dept));
+  const w=(m.waiting||[]).concat(fol);
+  if(!w.length){b.appendChild(el("div","empty","لم يتم اختيار جهات لهذه المذكرة."));}
   w.forEach(u=>{
     const r=m.replies&&m.replies[u]?m.replies[u]:{ok:false,text:"",date:""};
     const box=el("div","replybox"+(r.ok?" done":""));box.dataset.unit=u;
     const hd=el("div","hd");
     const c=document.createElement("input");c.type="checkbox";c.style.width="auto";c.className="rep-ok";c.checked=!!r.ok;
     c.onchange=e=>box.classList.toggle("done",e.target.checked);
-    hd.appendChild(c);hd.appendChild(el("span",null,u));
+    hd.appendChild(c);hd.appendChild(el("span",null,u.replace(/^@/,"متابعة داخلية: ")));
     const dt=document.createElement("input");dt.type="date";dt.className="rep-date";dt.style.maxWidth="170px";dt.value=r.date||"";
     hd.appendChild(dt);box.appendChild(hd);
     const ta=document.createElement("textarea");ta.className="rep-text";ta.placeholder="نص رد القسم…";ta.value=r.text||"";
@@ -1280,9 +1507,11 @@ function chipFor(m,u){
 function renderMemos(){
   const st=$("#a-status").value,q=$("#a-search").value.trim();
   const RK={lateA:0,open:1,done:2};
+  const fd=$("#a-fd")?$("#a-fd").value:"",fs=$("#a-fs")?$("#a-fs").value:"";
   const rows=DB.memos.filter(m=>aDone?m.done:!m.done)
+    .filter(m=>!fd||(m.follow||[]).some(f=>f.dept===fd&&(!fs||f.sec===fs)))
     .filter(m=>st==="all"||memoStatus(m).k===st)
-    .filter(m=>!q||[m.no,m.title,m.sender,m.doneNo].join(" ").includes(q))
+    .filter(m=>!q||[m.no,m.title,m.sender,m.action,m.actionOther,m.doneNo].join(" ").includes(q))
     .sort((a,b)=>RK[memoStatus(a).k]-RK[memoStatus(b).k]||workdaysSince(b.date)-workdaysSince(a.date));
 
   const cw=$("#a-cards");cw.innerHTML="";
@@ -1293,30 +1522,81 @@ function renderMemos(){
     rows.forEach(m=>{
       const s=memoStatus(m);
       const c=el("div","arch-card "+s.k);
-      const sq=el("div","seq");sq.appendChild(el("b",null,String(m.no||"—")));
-      sq.appendChild(document.createTextNode("  ·  "+fmt(m.date)));c.appendChild(sq);
-      c.appendChild(el("h3",null,m.title||"—"));
-      const dl=el("dl");dl.style.display="grid";dl.style.gridTemplateColumns="auto 1fr";
-      dl.style.gap="3px 10px";dl.style.fontSize="12.5px";dl.style.margin="6px 0";
-      const add=(k,v)=>{const a=el("dt",null,k);a.style.color="var(--muted)";const b2=el("dd",null,v||"—");b2.style.margin="0";dl.appendChild(a);dl.appendChild(b2)};
-      add("الجهة المرسلة",m.sender);
-      add("الحالة",s.label);
-      if(m.done)add("رقم مذكرة الإنجاز",m.doneNo);
-      c.appendChild(dl);
-      c.appendChild(el("div","mini","انتظار الرد من:"));
-      const ch=el("div","chips");(m.waiting||[]).forEach(u=>ch.appendChild(chipFor(m,u)));
-      if(!(m.waiting||[]).length)ch.appendChild(el("span","mini","لم تُحدَّد أقسام."));
-      c.appendChild(ch);
-      const rep=(m.waiting||[]).filter(u=>m.replies&&m.replies[u]&&m.replies[u].ok).length;
-      c.appendChild(el("div","mini","الردود: "+rep+" من "+(m.waiting||[]).length));
+      const ico=(d,cls)=>{const x=el("button","icon-only"+(cls||""));
+        x.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+d+'</svg>';return x};
+
+      /* السطر 1: رقم المذكرة + التاريخ + الحالة */
+      const l1=el("div","m-line");
+      l1.appendChild(el("span","m-lbl","رقم المذكرة"));
+      l1.appendChild(el("span","m-no",String(m.no||"—")));
+      l1.appendChild(el("span","m-date",fmt(m.date)));
+      const st=el("span","b-state "+(m.done?"doneS":"open"),m.done?"أنجزت":s.label);
+      st.style.marginInlineStart="auto";l1.appendChild(st);
+      c.appendChild(l1);
+
+      /* السطر 2: العنوان + الإجراء المطلوب */
+      const l2=el("div","m-line");
+      l2.appendChild(el("div","m-title",m.title||"—"));
+      l2.appendChild(el("span","m-act",(m.action==="أخرى"&&m.actionOther?m.actionOther:m.action)||"—"));
+      c.appendChild(l2);
+
+      /* السطر 3: الجهة المرسلة */
+      const l3=el("div","m-line");
+      const sn=(Array.isArray(m.senders)?m.senders.join("، "):m.sender)||"—";
+      const sd=el("div","m-sender");sd.appendChild(el("b",null,"الجهة المرسلة: "));
+      sd.appendChild(document.createTextNode(sn));l3.appendChild(sd);
+      if(m.done&&m.doneNo){const dn=el("span","m-act","مذكرة الإنجاز: "+m.doneNo);l3.appendChild(dn)}
+      c.appendChild(l3);
+
+      /* السطر 4: انتظار الرد من + المتابعة مع */
+      const l4=el("div","m-line");
+      l4.appendChild(el("span","m-lbl","انتظار الرد من"));
+      (m.waiting||[]).forEach(u=>l4.appendChild(chipFor(m,u)));
+      if((m.follow||[]).length){
+        l4.appendChild(el("span","m-lbl","المتابعة مع"));
+        (m.follow||[]).forEach(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;
+          const r=m.replies&&m.replies["@"+nm];
+          const x=el("span","chip"+(r&&r.ok?" replied":" b-blue"));x.textContent=nm;
+          if(r&&r.ok)x.appendChild(el("span","tick","✓"));l4.appendChild(x)});
+      }
+      c.appendChild(l4);
+
+      /* الردود الواردة */
+      const reps=[];
+      (m.waiting||[]).forEach(u=>{const r=m.replies&&m.replies[u];if(r&&r.ok)reps.push([u,r])});
+      (m.follow||[]).forEach(fo=>{const nm=fo.sec?fo.dept+" — "+fo.sec:fo.dept;
+        const r=m.replies&&m.replies["@"+nm];if(r&&r.ok)reps.push([nm,r])});
+      if(reps.length){
+        const rb2=el("div","replybox done");rb2.style.marginTop="8px";
+        rb2.appendChild(el("div","hd","الردود الواردة"));
+        reps.forEach(([nm,r])=>{
+          const line=el("div");line.style.fontSize="12.5px";line.style.marginBottom="4px";
+          const b2=el("b",null,nm+": ");b2.style.color="var(--ok)";
+          line.appendChild(b2);
+          line.appendChild(document.createTextNode((r.text||"—")+(r.date?"  ("+fmt(r.date)+")":"")));
+          rb2.appendChild(line);
+        });
+        c.appendChild(rb2);
+      }
+
+      /* الأزرار كأيقونات */
       const f=el("div","foot");
-      const rb=el("button","btn ghost sm","رد الأقسام");rb.onclick=()=>openReplies(m);
-      const ed=el("button","btn ghost sm","تعديل");ed.onclick=()=>openMemo(m);
-      const dn=el("button","btn ghost sm",m.done?"إرجاع للمتابعة":"إنجاز");
+      const rb=ico('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>');
+      rb.title="رد الجهات";rb.onclick=()=>openReplies(m);
+      const ed=ico('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>');
+      ed.title="تعديل";ed.onclick=()=>openMemo(m);
+      const dn=ico(m.done?'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>':'<path d="M20 6 9 17l-5-5"/>');
+      dn.title=m.done?"إرجاع للمتابعة":"إنجاز";
+      dn.style.color=m.done?"var(--calm)":"var(--ok)";dn.style.borderColor=m.done?"var(--line)":"#BFE0D2";
       dn.onclick=async()=>{m.done=!m.done;await saveMemos()};
-      const x=el("button","btn danger sm","حذف");
-      x.onclick=async()=>{DB.memos=DB.memos.filter(y=>y.id!==m.id);await saveMemos();toast("حُذفت المذكرة")};
-      f.appendChild(rb);f.appendChild(ed);f.appendChild(dn);f.appendChild(x);c.appendChild(f);
+      const pr=ico('<path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7"/><path d="M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/>');
+      pr.title="طباعة هذه المذكرة";pr.onclick=()=>printMemos([m],"مذكرة رقم "+(m.no||""));
+      const x=ico('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>');
+      x.title="حذف";x.style.color="var(--late)";x.style.borderColor="#EFCBD0";
+      x.onclick=async()=>{if(!confirm("حذف المذكرة؟"))return;
+        DB.memos=DB.memos.filter(y=>y.id!==m.id);await saveMemos();toast("حُذفت المذكرة")};
+      [rb,ed,dn,pr,x].forEach(z=>f.appendChild(z));
+      c.appendChild(f);
       cw.appendChild(c);
     });
   }else{
@@ -1326,19 +1606,32 @@ function renderMemos(){
       tr.appendChild(numCell(m.no));
       tr.appendChild(el("td",null,m.title||"—"));
       tr.appendChild(el("td",null,fmt(m.date)));
-      tr.appendChild(el("td",null,m.sender||"—"));
+      tr.appendChild(el("td",null,(Array.isArray(m.senders)?m.senders.join("، "):m.sender)||"—"));
+      tr.appendChild(el("td",null,(m.action==="أخرى"&&m.actionOther?m.actionOther:m.action)||"—"));
       const wt=el("td","reply-cell");const ch=el("div","chips");
       (m.waiting||[]).forEach(u=>ch.appendChild(chipFor(m,u)));wt.appendChild(ch);tr.appendChild(wt);
+      const ft=el("td","reply-cell");const ch3=el("div","chips");
+      (m.follow||[]).forEach(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;
+        const r=m.replies&&m.replies["@"+nm];
+        const c=el("span","chip"+(r&&r.ok?" replied":" b-blue"));c.textContent=nm;
+        if(r&&r.ok)c.appendChild(el("span","tick","✓"));ch3.appendChild(c)});
+      if(!ch3.children.length)ch3.appendChild(el("span","mini","—"));
+      ft.appendChild(ch3);tr.appendChild(ft);
       const rp=el("td","reply-cell");const ch2=el("div","chips");
       (m.waiting||[]).filter(u=>m.replies&&m.replies[u]&&m.replies[u].ok).forEach(u=>ch2.appendChild(chipFor(m,u)));
       if(!ch2.children.length)ch2.appendChild(el("span","mini","—"));
       rp.appendChild(ch2);tr.appendChild(rp);
-      const ts=el("td");ts.appendChild(el("span","state "+(s.k==="done"?"ok":s.k==="lateA"?"soon":"ok"),s.label));tr.appendChild(ts);
+      const ts=el("td");ts.appendChild(el("span","b-state "+(m.done?"doneS":"open"),m.done?"أنجزت":s.label));tr.appendChild(ts);
       tr.appendChild(numCell(m.doneNo));
       const td=el("td","rowtools");
-      const rb=el("button","btn sm","رد الأقسام");rb.onclick=()=>openReplies(m);
-      const ed=el("button","btn ghost sm","تعديل");ed.onclick=()=>openMemo(m);
-      const x=el("button","btn danger sm","حذف");
+      const mk2=(d,t)=>{const z=el("button","icon-only");z.title=t;
+        z.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+d+'</svg>';return z};
+      const rb=mk2('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',"رد الجهات");
+      rb.onclick=()=>openReplies(m);
+      const ed=mk2('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',"تعديل");
+      ed.onclick=()=>openMemo(m);
+      const x=mk2('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>',"حذف");
+      x.style.color="var(--late)";x.style.borderColor="#EFCBD0";
       x.onclick=async()=>{DB.memos=DB.memos.filter(y=>y.id!==m.id);await saveMemos();toast("حُذفت المذكرة")};
       td.appendChild(rb);td.appendChild(ed);td.appendChild(x);tr.appendChild(td);b.appendChild(tr);
     });
@@ -1349,46 +1642,90 @@ function renderMemos(){
   $("#late-panel").style.display=aDone?"none":"block";
 
   const box=$("#late-depts");box.innerHTML="";
-  const agg={};
-  DB.memos.forEach(m=>lateUnits(m).forEach(u=>{(agg[u]=agg[u]||[]).push(m)}));
-  const keys=Object.keys(agg).sort((a,b)=>agg[b].length-agg[a].length);
-  if(!keys.length){box.appendChild(el("div","empty","لا توجد أقسام متأخرة حاليًا."));}
-  keys.forEach(u=>{
-    const col=el("div","lateA-col");
-    const h=el("div");h.style.fontFamily="var(--watad)";h.style.color="var(--late)";
-    h.textContent=u+" · "+agg[u].length+" مذكرة";col.appendChild(h);
-    agg[u].forEach(m=>{
-      const it=el("div","it",(m.no?"#"+m.no+" · ":"")+(m.title||"")+" — "+workdaysSince(m.date)+" يوم عمل");
-      col.appendChild(it);
-    });
-    box.appendChild(col);
+  const lateAll=DB.memos.filter(m=>!m.done&&memoStatus(m).k==="lateA")
+    .sort((a,b)=>workdaysSince(b.date)-workdaysSince(a.date));
+  const bd=$("#late-badges");bd.innerHTML="";
+  const openN=DB.memos.filter(m=>!m.done).length;
+  const t1=el("span","late-total","المتأخرة: "+lateAll.length);
+  const t2=el("span","late-total","تحت الإنجاز: "+openN);
+  t2.style.background="var(--maroon)";t2.style.marginInlineStart="8px";
+  const t3=el("span","late-total","أنجزت: "+DB.memos.filter(m=>m.done).length);
+  t3.style.background="var(--ok)";t3.style.marginInlineStart="8px";
+  bd.appendChild(t1);bd.appendChild(t2);bd.appendChild(t3);
+  if(!lateAll.length){box.appendChild(el("div","empty","لا توجد مذكرات متأخرة حاليًا."));}
+  const list=el("div","late-list");box.appendChild(list);
+  lateAll.forEach(m=>{
+    const row=el("div","lm");
+    row.appendChild(el("b",null,"#"+(m.no||"—")));
+    const t=el("div","t",m.title||"—");
+    const pend=lateUnits(m).concat((m.follow||[]).filter(f=>{
+      const k="@"+(f.sec?f.dept+" — "+f.sec:f.dept);
+      return !(m.replies&&m.replies[k]&&m.replies[k].ok);
+    }).map(f=>f.sec?f.dept+" — "+f.sec:f.dept));
+    t.appendChild(el("span","sub","لم يردّ: "+(pend.join("، ")||"—")+" · "+fmt(m.date)));
+    row.appendChild(t);
+    row.appendChild(el("div","d",workdaysSince(m.date)+" يوم عمل"));
+    const acts=el("div");acts.style.marginTop="7px";acts.style.display="flex";acts.style.gap="6px";
+    const mk=(d,t,fn)=>{const x=el("button","icon-only");x.title=t;
+      x.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+d+'</svg>';
+      x.onclick=ev=>{ev.stopPropagation();fn()};return x};
+    acts.appendChild(mk('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',"تعديل",()=>openMemo(m)));
+    acts.appendChild(mk('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',"رد الجهات",()=>openReplies(m)));
+    row.appendChild(acts);
+    list.appendChild(row);
   });
 }
 
-
 /* ===== طباعة المذكرات ===== */
+function printMemos(rows,ttl){
+  if(!rows.length)return toast("لا توجد مذكرات للطباعة");
+  __printMemos(rows,ttl);
+}
 $("#a-print").onclick=()=>{
   const sc=$("#a-print-scope").value;
   const rows=DB.memos.filter(m=>sc==="all"?true:sc==="done"?m.done:!m.done)
     .sort((a,b)=>(a.no||"").localeCompare(b.no||""));
   if(!rows.length)return toast("لا توجد مذكرات للطباعة");
   const ttl=sc==="done"?"المذكرات المنجزة":sc==="open"?"المذكرات تحت الإنجاز":"جميع المذكرات";
+  __printMemos(rows,ttl);
+};
+function __printMemos(rows,ttl){
   const body=rows.map((m,i)=>{
     const st=memoStatus(m);
     const w=(m.waiting||[]).map(u=>u+((m.replies&&m.replies[u]&&m.replies[u].ok)?" ✓":"")).join("، ")||"—";
+    const fl=(m.follow||[]).map(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;
+      const r=m.replies&&m.replies["@"+nm];return nm+(r&&r.ok?" ✓":"")}).join("، ")||"—";
+    const rt=[].concat((m.waiting||[]).map(u=>[u,m.replies&&m.replies[u]]),
+      (m.follow||[]).map(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;return [nm,m.replies&&m.replies["@"+nm]]}))
+      .filter(x=>x[1]&&x[1].ok&&x[1].text).map(x=>x[0]+": "+x[1].text).join(" | ")||"—";
+    const sn=(Array.isArray(m.senders)?m.senders.join("، "):m.sender)||"—";
+    const ac=(m.action==="أخرى"&&m.actionOther?m.actionOther:m.action)||"—";
     return "<tr><td>"+(i+1)+"</td><td>"+(m.no||"—")+"</td><td>"+(m.title||"—")+"</td><td>"+fmt(m.date)
-      +"</td><td>"+(m.sender||"—")+"</td><td>"+w+"</td><td>"+st.label+"</td><td>"+(m.doneNo||"—")+"</td></tr>";
+      +"</td><td>"+sn+"</td><td>"+ac+"</td><td>"+w+"</td><td>"+fl+"</td><td>"+rt+"</td><td>"+st.label+"</td><td>"+(m.doneNo||"—")+"</td></tr>";
   }).join("");
+  const logo=DB.settings.logo||DEF_LOGO;
+  const org=DB.settings.appName||"الوصل";
+  const orgSub=DB.settings.appTag||"";
+  const lateN=rows.filter(m=>!m.done&&memoStatus(m).k==="lateA").length;
   const html='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>'+ttl+'</title>'
-    +'<style>body{font-family:Tahoma,Arial;padding:22px;color:#22262B}h1{font-size:18px;color:#8A1538;margin:0 0 4px}'
-    +'.sub{font-size:12px;color:#777;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:12px}'
+    +'<style>body{font-family:Tahoma,Arial;padding:18px;color:#22262B}'
+    +'.rep-hd{display:flex;align-items:center;gap:14px;border-bottom:3px solid #8A1538;padding-bottom:10px}'
+    +'.rep-hd img{width:62px;height:62px;object-fit:contain}'
+    +'.rep-hd h1{font-size:20px;color:#8A1538;margin:0}'
+    +'.rep-hd h2{font-size:13px;color:#555;margin:2px 0 0;font-weight:normal}'
+    +'.rep-hd .t{font-size:15px;color:#8A1538;margin-top:6px}'
+    +'.sub{font-size:12px;color:#777;margin:9px 0 13px}'
+    +'.late{color:#C0182B;font-weight:bold}'
+    +'table{width:100%;border-collapse:collapse;font-size:11.5px}'
     +'th{background:#8A1538;color:#fff;padding:7px;border:1px solid #8A1538;text-align:right}'
     +'td{border:1px solid #ccc;padding:6px;vertical-align:top}tr:nth-child(even) td{background:#FAFAFA}'
-    +'@page{size:A4 landscape;margin:12mm}</style></head><body>'
-    +'<h1>'+(DB.settings.appName||"الوصل")+' — '+ttl+'</h1>'
-    +'<div class="sub">تاريخ الطباعة: '+fmtD(new Date())+' · عدد المذكرات: '+rows.length+'</div>'
+    +'@page{size:A4 landscape;margin:10mm}</style></head><body>'
+    +'<div class="rep-hd"><img src="'+logo+'"><div><h1>'+org+'</h1>'
+    +(orgSub?'<h2>'+orgSub+'</h2>':'')+'<div class="t">'+ttl+'</div></div></div>'
+    +'<div class="sub">تاريخ الطباعة: '+fmtD(new Date())+' · عدد المذكرات: '+rows.length
+    +' · <span class="late">المتأخرة: '+lateN+'</span></div>'
     +'<table><thead><tr><th>م</th><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th>'
-    +'<th>انتظار الرد من</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th></tr></thead><tbody>'+body+'</tbody></table>'
+    +'<th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>ردود الجهات</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th></tr></thead><tbody>'+body+'</tbody></table>'
     +'<script>onload=()=>{print();}<\/script></body></html>';
   const w=window.open("","_blank");
   if(!w)return toast("اسمح بالنوافذ المنبثقة للطباعة");
@@ -1493,7 +1830,7 @@ function renderCounters(){
   add("people",DB.contacts.length,"","أرقام الدليل");
   add("mail",DB.mails.length,"","عناوين المراسلة");
 }
-function renderAll(){renderContacts();renderMails();renderTasks();renderMemos();renderStats();renderCounters();fillAllSelects();applyPerms()}
+function renderAll(){initFilters();renderContacts();renderMails();renderTasks();renderMemos();renderStats();renderCounters();fillAllSelects();applyPerms()}
 
 
 /* ================= التزامن مع Firebase ================= */
@@ -1629,6 +1966,7 @@ $("#sp-import").onchange=e=>{
   };
   r.readAsText(f);
 };
+$("#sp-seed").onclick=async()=>{await seedData(true);renderAll();toast("أُعيد تحميل بيانات الهواتف والمواضيع")};
 $("#sp-export").onclick=()=>{
   const data={contacts:DB.contacts,mails:DB.mails,tasks:DB.tasks,seq:DB.seq,memos:DB.memos,
     lists:DB.lists,users:DB.users,settings:DB.settings};
@@ -1678,10 +2016,11 @@ function hookImport(id,kind){
       for(const r of rows){
         if(kind==="contact"){
           const name=pick(r,["الاسم","اسم الموظف","Name"]);if(!name)continue;
-          const dept=pick(r,["الإدارة","الادارة","Department"]),sec=pick(r,["القسم","Section"]);
+          const cmail=pick(r,["البريد الإلكتروني","الإيميل","الايميل","Email"]);
+          const dept=pick(r,["الإدارة","الادارة","الجهة","Department"]),sec=pick(r,["القسم","Section"]);
           await ensureDept(dept,sec);
-          DB.contacts.push({id:Date.now()+n,name,ext:pick(r,["الخط","التحويلة","Ext"]),
-            mob:pick(r,["الجوال","الهاتف","Mobile"]),title:pick(r,["الصفة","المسمى","Title"]),dept,sec});n++;
+          DB.contacts.push({id:Date.now()+n,name,ext:pick(r,["الخط","التحويلة","الهاتف","Ext"]),
+            mob:pick(r,["الجوال","Mobile"]),email:cmail,title:pick(r,["الصفة","المسمى","Title"]),dept,sec});n++;
         }else if(kind==="mail"){
           const name=pick(r,["الاسم","Name"]),email=pick(r,["الإيميل","البريد","الايميل","Email"]);
           if(!email)continue;
@@ -1696,12 +2035,27 @@ function hookImport(id,kind){
             prio:pick(r,["الأهمية","Priority"])||"متوسطة",entity:pick(r,["الجهة","الجهة المتابعة","Entity"]),
             phone:pick(r,["الهاتف","Phone"]),det:pick(r,["التفاصيل","تفاصيل المهمة","Details"]),done:false,doneAt:null});n++;
         }else if(kind==="memo"){
-          const no=pick(r,["رقم المذكرة","الرقم","No"]),title=pick(r,["العنوان","Title"]);
+          const bk=pick(r,["رقم الكتاب","رقم كتاب","Book"]);
+          const rf=pick(r,["الرقم","رقم المذكرة","No"]);
+          const no=bk||rf,title=pick(r,["العنوان","الموضوع","Title"]);
           if(!no&&!title)continue;
-          const units=pick(r,["الأقسام","انتظار الرد من","Units"]).split(/[,،]/).map(x=>x.trim()).filter(Boolean);
+          /* الإجراء المطلوب — يُضاف للقائمة إن كان جديدًا */
+          let act=pick(r,["الإجراء المطلوب","الاجراء المطلوب","الإجراء","Action"]).trim();
+          if(act&&!DB.lists.actions.includes(act))DB.lists.actions.push(act);
+          /* مرسل إلى — كل جهة تصير قسمًا محددًا بعلامة صح */
+          const toRaw=pick(r,["مرسل إلى","مرسل الى","المرسل إليه","الجهات","To"]);
+          let units=toRaw.split(/[,،\/\n]|\s-\s/).map(x=>x.trim()).filter(Boolean);
+          /* إن ذُكرت إدارة الدعوة والإرشاد الديني بأي صيغة تُثبَّت بالاسم الموحّد */
+          const DAWA="إدارة الدعوة والإرشاد الديني";
+          if(/الدعوة/.test(toRaw)){units=units.filter(u=>!/الدعوة/.test(u));units.unshift(DAWA)}
           units.forEach(u=>{if(!DB.lists.units.includes(u))DB.lists.units.push(u)});
-          DB.memos.push({id:Date.now()+n,no,title,date:xlDate(pick(r,["التاريخ","Date"])),
-            sender:pick(r,["الجهة المرسلة","المرسل","Sender"]),done:false,doneNo:"",waiting:units,replies:{}});n++;
+          /* الجهة المرسلة */
+          const sndRaw=pick(r,["الجهة المرسلة","المرسل","Sender"]);
+          const senders=sndRaw.split(/[,،\/\n]/).map(x=>x.trim()).filter(Boolean);
+          senders.forEach(u=>{if(!DB.lists.senders.includes(u))DB.lists.senders.push(u)});
+          DB.memos.push({id:Date.now()+n,no,ref:rf,title,date:xlDate(pick(r,["التاريخ","Date"])),
+            senders,sender:senders.join("، "),action:act||"لإجراء اللازم",actionOther:"",
+            done:false,doneNo:"",waiting:[DAWA],follow:[],replies:{}});n++;
         }
       }
       await save("dir:lists",DB.lists);
@@ -1736,19 +2090,82 @@ $("#lg-in").onclick=()=>{
 $("#lg-pass").addEventListener("keydown",e=>{if(e.key==="Enter")$("#lg-in").click()});
 $("#logout").onclick=()=>showLogin();
 
+
+/* ================= زرع بيانات الملفين (مرة واحدة) ================= */
+const DAWA="إدارة الدعوة والإرشاد الديني";
+async function pruneUnits(){
+  let touched=false;
+  /* أقسام الأرشيف: إدارة الدعوة فقط */
+  if(JSON.stringify(DB.lists.units||[])!==JSON.stringify([DAWA])){DB.lists.units=[DAWA];touched=true}
+  /* توحيد مسمى إدارة الدعوة في قائمة الإدارات */
+  (DB.lists.depts||[]).forEach(d=>{if(d.name==="الدعوة"){d.name=DAWA;touched=true}});
+  DB.contacts.forEach(c=>{if(c.dept==="الدعوة"){c.dept=DAWA;touched=true}});
+  DB.mails.forEach(c=>{if(c.dept==="الدعوة"){c.dept=DAWA;touched=true}});
+  DB.memos.forEach(m=>{
+    const w=(m.waiting||[]).filter(u=>u===DAWA);
+    const nw=w.length?w:[DAWA];
+    if(JSON.stringify(nw)!==JSON.stringify(m.waiting||[])){m.waiting=nw;touched=true}
+    (m.follow||[]).forEach(f=>{if(f.dept==="الدعوة"){f.dept=DAWA;touched=true}});
+    if(m.replies)Object.keys(m.replies).forEach(k=>{if(k!==DAWA&&!/^@/.test(k)){delete m.replies[k];touched=true}});
+  });
+  if(touched){await save("dir:lists",DB.lists);await save("dir:memos",DB.memos);
+    await save("dir:contacts",DB.contacts);await save("dir:mails",DB.mails)}
+}
+/* قوائم الأرشيف والمراسلات: إدارة الدعوة فقط */
+const dawaDept=()=>(DB.lists.depts||[]).filter(d=>d.name===DAWA);
+function fillDawaDept(sel,val){
+  if(!sel)return;const cur=val!=null?val:sel.value;sel.innerHTML="";
+  sel.appendChild(new Option("— اختر الإدارة —",""));
+  dawaDept().forEach(d=>sel.appendChild(new Option(d.name,d.name)));
+  sel.value=cur||DAWA;
+}
+async function seedData(force){
+  const done=await load("dir:seeded",false);
+  if(done==="v2"&&!force)return;
+  /* ترقية: استبدال المذكرات القديمة بأرقام الكتب */
+  if(done&&done!=="v2"){DB.memos=[];}
+  /* الإدارات وأقسامها */
+  SEED.depts.forEach(d=>{
+    let x=DB.lists.depts.find(y=>y.name===d.name);
+    if(!x){x={name:d.name,secs:[]};DB.lists.depts.push(x)}
+    (d.secs||[]).forEach(sc=>{if(!x.secs.includes(sc))x.secs.push(sc)});
+  });
+  /* أقسام الأرشيف والإجراءات */
+  SEED.units.forEach(u=>{if(!DB.lists.units.includes(u))DB.lists.units.push(u)});
+  SEED.actions.forEach(a=>{if(!DB.lists.actions.includes(a))DB.lists.actions.push(a)});
+  /* الأرقام */
+  let t=Date.now();
+  SEED.contacts.forEach(c=>{
+    if(DB.contacts.some(x=>x.name===c.name&&x.ext===c.ext))return;
+    DB.contacts.push(Object.assign({id:t++},c));
+  });
+  /* المذكرات */
+  SEED.memos.forEach(m=>{
+    if(DB.memos.some(x=>x.no&&x.no===m.no))return;
+    DB.memos.push(Object.assign({id:t++},JSON.parse(JSON.stringify(m))));
+  });
+  await save("dir:lists",DB.lists);
+  await save("dir:contacts",DB.contacts);
+  await save("dir:memos",DB.memos);
+  await save("dir:seeded","v2");
+}
+
 /* ================= الإقلاع ================= */
 async function boot(){
   DB.contacts=await load("dir:contacts",[]);
   DB.mails=await load("dir:mails",[]);
   DB.lists=await load("dir:lists",DB.lists);
   migrateDepts();
-  if(!DB.lists.units)DB.lists.units=["الشؤون الإدارية","الشؤون المالية","تقنية المعلومات","الموارد البشرية","الشؤون القانونية"];
+  DB.lists.units=["إدارة الدعوة والإرشاد الديني"];
   if(!DB.lists.senders)DB.lists.senders=["مكتب الوكيل","الأرشيف المركزي","الإدارة العامة"];
+  if(!DB.lists.actions)DB.lists.actions=["لإجراء اللازم","لإجراء اللازم حسب المطلوب","لرفع الإفادة لمكتب سعادة الوزير","أخرى"];
   DB.memos=await load("dir:memos",[]);
   DB.users=await load("dir:users",DB.users);
   DB.settings=await load("dir:settings",DB.settings);
   const t=await load("dir:tasks",{list:[],seq:1});
   DB.tasks=t.list||[];DB.seq=t.seq||DB.tasks.length+1;
+  await seedData(false);
+  await pruneUnits();
   applyBrand();renderAll();showLogin();
   const sp=$("#sp-id");if(sp)sp.value=SYNC.space;
   if(!SYNC.ready)await initSync();
