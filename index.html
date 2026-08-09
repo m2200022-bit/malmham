@@ -694,6 +694,7 @@ function statusOf(t){
   if(days<=2)return{k:"soon",label:days===0?"تستحق اليوم":"باقٍ "+days+" يوم",days};
   return{k:"ok",label:"باقٍ "+days+" يوم",days};
 }
+const ask=(msg)=>window.confirm(msg);
 let tT;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("on"),2200)}
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$("#"+b.dataset.close).classList.remove("on"));
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("on")}));
@@ -765,7 +766,8 @@ function renderList(){
       if($("#list-v2")){$("#list-v2").value=it.phone||"";fillDeptSelect($("#list-dept"),it.dept||"");fillSecSelect($("#list-sec"),it.dept||"",it.sec||"")}
       $("#list-note").textContent="جاهز للتحديث"};
     const d=el("button","btn danger sm","حذف");
-    d.onclick=async()=>{DB.lists[LIST_KEY].splice(i,1);await save("dir:lists",DB.lists);renderList();fillAllSelects();toast("حُذف العنصر")};
+    d.onclick=async()=>{if(!ask("سيتم حذف العنصر من القائمة.\nهل تريد المتابعة؟"))return;
+      DB.lists[LIST_KEY].splice(i,1);await save("dir:lists",DB.lists);renderList();fillAllSelects();toast("حُذف العنصر")};
     row.appendChild(e);row.appendChild(d);box.appendChild(row);
   });
   if(!DB.lists[LIST_KEY].length)box.appendChild(el("div","empty","القائمة فارغة."));
@@ -921,10 +923,11 @@ function __openRec(kind,rec){
   if(kind==="contact"){
     $("#rec-title").textContent=rec?"تعديل رقم":"إضافة رقم";
     g.appendChild(field("r-name","الاسم"));g.appendChild(field("r-ext","الخط"));g.appendChild(field("r-mob","الجوال"));
+    g.appendChild(field("r-email","البريد الإلكتروني","email"));
     g.appendChild(selectField("r-title","الصفة","titles",rec&&rec.title));
     deptPair(g,"r-dept","r-sec","الإدارة","القسم",rec&&rec.dept,rec&&rec.sec);
     if(rec){$("#r-name").value=rec.name;$("#r-ext").value=rec.ext||"";$("#r-mob").value=rec.mob||"";
-      $("#r-email").value=rec.email||""}
+      if($("#r-email"))$("#r-email").value=rec.email||""}
   }
   if(kind==="mail"){
     $("#rec-title").textContent=rec?"تعديل مراسلة":"إضافة مراسلة";
@@ -992,7 +995,7 @@ function __openRec(kind,rec){
 function readRec(){
   if(REC_KIND==="contact"){const ds=readDS("r-dept","r-sec");
     return{name:$("#r-name").value.trim(),ext:$("#r-ext").value.trim(),mob:$("#r-mob").value.trim(),
-      email:($("#r-email").value||"").trim(),title:$("#r-title").value,dept:ds.dept,sec:ds.sec}}
+      email:(($("#r-email")&&$("#r-email").value)||"").trim(),title:$("#r-title").value,dept:ds.dept,sec:ds.sec}}
   if(REC_KIND==="mail"){const ds=readDS("r-dept","r-sec");
     return{name:$("#r-name").value.trim(),dept:ds.dept,sec:ds.sec,
       email:$("#r-mail").value.trim(),role:$("#r-role").value}}
@@ -1083,6 +1086,7 @@ function renderUsers(){
     e.onclick=()=>{U_ID=u.id;$("#u-name").value=u.name;$("#u-job").value=u.job||"";setPerms(u.perms);$("#u-note").textContent="جاهز للتحديث"};
     const d=el("button","btn danger sm","حذف");
     d.onclick=async()=>{if(DB.users.length<2)return toast("لا يمكن حذف آخر مستخدم");
+      if(!ask("سيتم حذف المستخدم: "+u.name+"\nهل تريد المتابعة؟"))return;
       DB.users=DB.users.filter(x=>x.id!==u.id);
       if(DB.settings.current===u.id)DB.settings.current=DB.users[0].id;
       await save("dir:users",DB.users);await save("dir:settings",DB.settings);renderUsers();applyPerms();toast("حُذف المستخدم")};
@@ -1131,17 +1135,24 @@ function matchDS(rec,k){
 $("#c-search").oninput=renderContacts;
 $("#c-all").onchange=async e=>{
   const on=e.target.checked;
+  if(!on&&!ask("سيتم إزالة كل السجلات المعروضة من صفحة المراسلات.\nهل تريد المتابعة؟")){e.target.checked=true;return}
   const ids=[...document.querySelectorAll(".c-pick")].map(x=>x.dataset.id);
-  for(const id of ids){const c=DB.contacts.find(x=>String(x.id)===id);if(c&&c.email)await toMail(c,on)}
+  for(const id of ids){const c=DB.contacts.find(x=>String(x.id)===id);if(c)await toMail(c,on,true)}
+  await save("dir:mails",DB.mails);renderAll();
   toast(on?"نُقلت السجلات المحددة":"أُزيلت من المراسلات");
 };
 $("#c-to-mail").onclick=async()=>{
   const picked=[...document.querySelectorAll(".c-pick:checked")].map(x=>x.dataset.id);
   if(!picked.length)return toast("حدّد سجلًا واحدًا على الأقل");
-  let n=0;
-  for(const id of picked){const c=DB.contacts.find(x=>String(x.id)===id);
-    if(c&&c.email&&!DB.mails.some(y=>y.email===c.email)){await toMail(c,true);n++}}
-  toast(n?("نُقل "+n+" سجل إلى المراسلات"):"السجلات المحددة موجودة مسبقًا");
+  if(!ask("سيتم نسخ "+picked.length+" سجل إلى صفحة المراسلات.\nهل تريد المتابعة؟"))return;
+  let n=0,noMail=0;
+  for(const id of picked){
+    const c=DB.contacts.find(x=>String(x.id)===id);if(!c)continue;
+    if(!c.email)noMail++;
+    await toMail(c,true,true);n++;
+  }
+  await save("dir:mails",DB.mails);renderAll();
+  toast("نُسخ "+n+" سجل إلى المراسلات"+(noMail?" ("+noMail+" بلا بريد)":""));
 };
 function renderContacts(){
   const q=$("#c-search").value.trim();
@@ -1150,8 +1161,10 @@ function renderContacts(){
   rows.forEach((c,i)=>{
     const tr=el("tr");
     const tc=el("td");const cb=document.createElement("input");cb.type="checkbox";cb.style.width="auto";
-    cb.className="c-pick";cb.dataset.id=c.id;cb.checked=DB.mails.some(x=>x.email&&x.email===c.email);
-    cb.onchange=async e=>{await toMail(c,e.target.checked)};
+    cb.className="c-pick";cb.dataset.id=c.id;cb.checked=DB.mails.some(x=>mailKey(x)===mailKey(c));
+  cb.onchange=async e=>{
+      if(!e.target.checked&&!ask("سيتم إزالة «"+c.name+"» من صفحة المراسلات.\nهل تريد المتابعة؟")){e.target.checked=true;return}
+      await toMail(c,e.target.checked)};
     tc.appendChild(cb);tr.appendChild(tc);
     tr.appendChild(numCell(i+1));
     tr.appendChild(el("td",null,c.name));
@@ -1162,17 +1175,16 @@ function renderContacts(){
     const mb=el("button","icon-only");mb.title="إضافة إلى المراسلات";
     mb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>';
     mb.onclick=async()=>{
-      if(!c.email)return toast("لا يوجد بريد إلكتروني لهذا السجل — أضفه أولًا");
-      if(DB.mails.some(x=>x.email===c.email))return toast("موجود مسبقًا في المراسلات");
-      DB.mails.push({id:Date.now(),name:c.name,dept:c.dept,sec:c.sec,email:c.email,role:c.title||"موظف"});
-      await save("dir:mails",DB.mails);renderAll();toast("أُضيف إلى المراسلات");
+
+      await toMail(c,true);toast("نُسخ إلى المراسلات");
     };
     const e=el("button","icon-only");e.title="تعديل";
     e.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
     e.onclick=()=>openRec("contact",c);
     const d=el("button","icon-only");d.title="حذف";d.style.color="var(--late)";d.style.borderColor="#EFCBD0";
     d.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
-    d.onclick=async()=>{DB.contacts=DB.contacts.filter(x=>x.id!==c.id);await save("dir:contacts",DB.contacts);renderAll();toast("حُذف الرقم")};
+    d.onclick=async()=>{if(!ask("سيتم حذف السجل: "+c.name+"\nهل تريد المتابعة؟"))return;
+      DB.contacts=DB.contacts.filter(x=>x.id!==c.id);await save("dir:contacts",DB.contacts);renderAll();toast("حُذف الرقم")};
     td.appendChild(mb);td.appendChild(e);td.appendChild(d);tr.appendChild(td);b.appendChild(tr);
   });
   $("#c-empty").style.display=rows.length?"none":"block";
@@ -1181,16 +1193,20 @@ function renderContacts(){
 
 
 /* ===== نقل بيانات الدليل إلى المراسلات ===== */
-async function toMail(c,on){
+function mailKey(c){return (c.email||"").toLowerCase()||("~"+c.name+"|"+(c.ext||""))}
+async function toMail(c,on,quiet){
   if(on){
-    if(!c.email)return toast("لا يوجد بريد إلكتروني للسجل: "+c.name);
-    if(!DB.mails.some(x=>x.email===c.email))
-      DB.mails.push({id:Date.now()+Math.floor(Math.random()*999),name:c.name,dept:c.dept,sec:c.sec,
-        email:c.email,role:c.title||"موظف",ext:c.ext||"",mob:c.mob||""});
+    const k=mailKey(c);
+    const i=DB.mails.findIndex(x=>mailKey(x)===k);
+    const rec={name:c.name,dept:c.dept||"",sec:c.sec||"",email:c.email||"",
+      role:c.title||"موظف",ext:c.ext||"",mob:c.mob||"",srcId:c.id};
+    if(i>=0)DB.mails[i]=Object.assign(DB.mails[i],rec);
+    else DB.mails.push(Object.assign({id:Date.now()+Math.floor(Math.random()*9999)},rec));
   }else{
-    DB.mails=DB.mails.filter(x=>x.email!==c.email);
+    const k=mailKey(c);
+    DB.mails=DB.mails.filter(x=>mailKey(x)!==k);
   }
-  await save("dir:mails",DB.mails);renderAll();
+  if(!quiet){await save("dir:mails",DB.mails);renderAll()}
 }
 
 /* ================= المراسلات ================= */
@@ -1213,7 +1229,8 @@ function renderMails(){
     const td=el("td","rowtools");
     const e=el("button","btn sm","تعديل");e.style.background="var(--blue)";e.style.borderColor="var(--blue)";e.onclick=()=>openRec("mail",m);
     const d=el("button","btn danger sm","حذف");
-    d.onclick=async()=>{DB.mails=DB.mails.filter(x=>x.id!==m.id);await save("dir:mails",DB.mails);renderAll();toast("حُذف البريد")};
+    d.onclick=async()=>{if(!ask("سيتم حذف البريد: "+(m.name||m.email)+"\nهل تريد المتابعة؟"))return;
+      DB.mails=DB.mails.filter(x=>x.id!==m.id);await save("dir:mails",DB.mails);renderAll();toast("حُذف البريد")};
     td.appendChild(e);td.appendChild(d);tr.appendChild(td);b.appendChild(tr);
   });
   $("#m-empty").style.display=b.children.length?"none":"block";summary();
@@ -1251,7 +1268,8 @@ $("#view-table").onclick=()=>{view="table";showDone=false;renderTasks()};
 $("#view-done").onclick=()=>{showDone=!showDone;renderTasks();toast(showDone?"عرض المنجزات":"عرض المهام الجارية")};
 async function toggleDone(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString().slice(0,10):null;
   await save("dir:tasks",{list:DB.tasks,seq:DB.seq});renderAll()}
-async function delTask(t){DB.tasks=DB.tasks.filter(x=>x.id!==t.id);await save("dir:tasks",{list:DB.tasks,seq:DB.seq});renderAll();toast("حُذفت المهمة")}
+async function delTask(t){if(!ask("سيتم حذف المهمة: "+(t.title||"")+"\nهل تريد المتابعة؟"))return;
+  DB.tasks=DB.tasks.filter(x=>x.id!==t.id);await save("dir:tasks",{list:DB.tasks,seq:DB.seq});renderAll();toast("حُذفت المهمة")}
 const prioCls=p=>p==="عالية"?"high":p==="متوسطة"?"mid":"";
 /* الترتيب: قاربت على الاستحقاق أولًا، ثم المتجاوزة، ثم البقية */
 const RANK={soon:0,late:1,ok:2,done:3};
@@ -1668,7 +1686,7 @@ function renderMemos(){
       pr.title="طباعة هذه المذكرة";pr.onclick=()=>printMemos([m],"مذكرة رقم "+(m.no||""));
       const x=ico('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>');
       x.title="حذف";x.style.color="var(--late)";x.style.borderColor="#EFCBD0";
-      x.onclick=async()=>{if(!confirm("حذف المذكرة؟"))return;
+      x.onclick=async()=>{if(!ask("سيتم حذف المذكرة رقم "+(m.no||"")+"\nهل تريد المتابعة؟"))return;
         DB.memos=DB.memos.filter(y=>y.id!==m.id);await saveMemos();toast("حُذفت المذكرة")};
       [rb,ed,dn,pr,x].forEach(z=>f.appendChild(z));
       c.appendChild(f);
@@ -1708,7 +1726,8 @@ function renderMemos(){
       ed.onclick=()=>openMemo(m);
       const x=mk2('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>',"حذف");
       x.style.color="var(--late)";x.style.borderColor="#EFCBD0";
-      x.onclick=async()=>{DB.memos=DB.memos.filter(y=>y.id!==m.id);await saveMemos();toast("حُذفت المذكرة")};
+      x.onclick=async()=>{if(!ask("سيتم حذف المذكرة رقم "+(m.no||"")+"\nهل تريد المتابعة؟"))return;
+        DB.memos=DB.memos.filter(y=>y.id!==m.id);await saveMemos();toast("حُذفت المذكرة")};
       td.appendChild(rb);td.appendChild(ed);td.appendChild(x);tr.appendChild(td);b.appendChild(tr);
     });
   }
@@ -2084,7 +2103,8 @@ $("#sp-import").onchange=e=>{
   };
   r.readAsText(f);
 };
-$("#sp-seed").onclick=async()=>{await seedData(true);renderAll();toast("أُعيد تحميل بيانات الهواتف والمواضيع")};
+$("#sp-seed").onclick=async()=>{if(!ask("سيتم إعادة تحميل بيانات الملفين.\nهل تريد المتابعة؟"))return;
+  await seedData(true);renderAll();toast("أُعيد تحميل بيانات الهواتف والمواضيع")};
 $("#sp-export").onclick=()=>{
   const data={contacts:DB.contacts,mails:DB.mails,tasks:DB.tasks,seq:DB.seq,memos:DB.memos,
     lists:DB.lists,users:DB.users,settings:DB.settings};
