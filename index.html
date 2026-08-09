@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --maroon:#8A1538; --maroon-dk:#6D0F2B; --maroon-soft:#F5E9ED; --maroon-line:#E3CBD3;
@@ -20,12 +20,12 @@
   --late:#C0182B; --late-bg:#FCEDEF;
   --soon:#D4A017; --soon-bg:#FDF7E3;
   --ok:#2E7D64; --ok-bg:#EAF4F0;
-  --watad:"Al-Watad","AlWatad","Al Watad","Cairo","IBM Plex Sans Arabic",sans-serif;
+  --watad:"Tajawal","Cairo",sans-serif;
   --r:12px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;
+body{background:var(--bg);color:var(--ink);font-family:"Tajawal","Cairo",system-ui,Tahoma,sans-serif;
   font-size:15px;line-height:1.6;font-variant-numeric:lining-nums tabular-nums}
 :focus-visible{outline:2px solid var(--maroon);outline-offset:2px}
 
@@ -250,6 +250,7 @@ td.reply-cell{min-width:180px}
 .late-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;width:100%}
 .late-list .lm{display:block;background:#fff;border:2px solid var(--late);border-radius:10px;padding:10px 12px;cursor:pointer}
 .late-list .lm b{color:var(--late);font-family:var(--watad);direction:ltr;font-size:18px}
+.m-seq{background:#111;color:#fff;border-radius:6px;padding:1px 9px;font-family:var(--watad);font-size:12px;direction:ltr}
 .late-list .lm .t{font-size:13px;margin-top:3px;display:block}
 .late-list .lm .d{display:inline-block;margin-top:6px;background:var(--late);color:#fff;border-radius:20px;
   padding:2px 10px;font-size:12px;font-family:var(--watad)}
@@ -400,11 +401,12 @@ td.reply-cell{min-width:180px}
       <button class="btn ghost sm" id="view-cards">عرض مربعات</button>
       <button class="btn ghost sm" id="view-table">عرض جدول</button>
       <button class="btn ghost sm" id="view-done">المنجزات <span id="done-n"></span></button>
+      <span id="t-badges"></span>
     </div>
     <div class="cards" id="t-cards"></div>
     <div id="t-tablewrap" style="display:none">
       <div class="sheet"><div class="scroll"><table>
-        <thead><tr><th>م</th><th>العنوان</th><th>النوع</th><th>البداية</th><th>النهاية المتوقعة</th><th>الأهمية</th><th>الجهة المتابعة</th><th>الهاتف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <thead><tr><th>م</th><th>العنوان</th><th>النوع</th><th>البداية</th><th>النهاية المتوقعة</th><th>الأهمية</th><th>الجهة المتابعة</th><th>الأقسام</th><th>الهاتف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
         <tbody id="t-body"></tbody></table></div></div>
     </div>
     <div class="empty" id="t-empty">لا توجد مهام مطابقة.</div>
@@ -452,7 +454,7 @@ td.reply-cell{min-width:180px}
         <div class="cards" id="a-cards"></div>
         <div id="a-tablewrap" style="display:none">
           <div class="sheet"><div class="scroll"><table>
-            <thead><tr><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th><th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>ردّت</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>م</th><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th><th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>ردّت</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th><th>إجراءات</th></tr></thead>
             <tbody id="a-body"></tbody></table></div></div>
         </div>
         <div class="empty" id="a-empty">لا توجد مذكرات مطابقة.</div>
@@ -672,7 +674,8 @@ const DB={contacts:[],mails:[],tasks:[],seq:1,
   users:[{id:1,name:"مدير النظام",job:"مسؤول",perms:{dir:1,mail:1,tasks:1,arch:1,stats:1,settings:1}}]};
 
 /* ================= أدوات ================= */
-const $=s=>document.querySelector(s);
+const $=sel=>{try{return (sel&&sel!=="#")?document.querySelector(sel):null}catch(e){return null}};
+window.addEventListener("error",e=>{try{toast("خطأ: "+(e.message||""))}catch(_){}});
 const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
 const DAY=864e5;
 const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
@@ -857,7 +860,8 @@ function quickDeptSec(idD,idS){
     if(sn&&!d.secs.includes(sn))d.secs.push(sn);
     await save("dir:lists",DB.lists);
     document.querySelectorAll("select[data-deptsel]").forEach(x=>fillDeptSelect(x,x.value));
-    const t=$("#"+idD);if(t){fillDeptSelect(t,dn);fillSecSelect($("#"+idS),dn,sn)}
+    const t=$("#"+idD);if(t){fillDeptSelect(t,dn);if(idS)fillSecSelect($("#"+idS),dn,sn)}
+    if(typeof drawESecsGlobal==="function")drawESecsGlobal();
     $("#ov-rec2").classList.remove("on");toast("أُضيفت "+dn+(sn?" — "+sn:""));
   };
   $("#ov-rec2").classList.add("on");
@@ -903,13 +907,14 @@ async function quickSec(idD,idS){
   if(!d.secs)d.secs=[];
   if(!d.secs.includes(v))d.secs.push(v);
   await save("dir:lists",DB.lists);
-  fillSecSelect($("#"+idS),dn,v);toast("أُضيف القسم "+v);
+  if(idS)fillSecSelect($("#"+idS),dn,v);toast("أُضيف القسم "+v);
 }
 const readDS=(idD,idS)=>({dept:$("#"+idD)?$("#"+idD).value:"",sec:$("#"+idS)?$("#"+idS).value:""});
 
 /* ================= نافذة السجل ================= */
 let REC_KIND=null,REC_ID=null;
-function openRec(kind,rec){
+function openRec(kind,rec){try{return __openRec(kind,rec)}catch(e){console.error(e);toast("تعذّر فتح النموذج: "+e.message)}}
+function __openRec(kind,rec){
   REC_KIND=kind;REC_ID=rec?rec.id:null;
   const b=$("#rec-body");b.innerHTML="";const g=el("div","fgrid");b.appendChild(g);
   $("#rec-note").textContent=rec?"وضع التعديل — استخدم «تحديث»":"سجل جديد — استخدم «حفظ»";
@@ -940,10 +945,43 @@ function openRec(kind,rec){
     g.appendChild(field("r-due","تاريخ النهاية المتوقعة","date"));
     const pr=el("div");pr.innerHTML='<label for="r-prio">الأهمية</label><select id="r-prio"><option>عالية</option><option selected>متوسطة</option><option>منخفضة</option></select>';
     g.appendChild(pr);
-    g.appendChild(selectField("r-entity","الجهة المتابعة معها","entities",rec&&rec.entity));
     g.appendChild(field("r-phone","هاتف للتواصل"));
+    /* الجهة المتابعة معها: إدارة ثم مربعات أقسامها */
+    const ew=el("div","full");
+    const ehd=el("div");ehd.style.display="flex";ehd.style.alignItems="center";ehd.style.gap="8px";
+    const elb=el("label",null,"الجهة المتابعة معها — الإدارة");elb.htmlFor="r-edept";elb.style.margin="0";elb.style.flex="1";
+    ehd.appendChild(elb);
+    const eadd=el("button","btn ghost sm","إضافة إدارة/قسم");eadd.type="button";
+    eadd.onclick=()=>quickDeptSec("r-edept","");
+    ehd.appendChild(eadd);ew.appendChild(ehd);
+    const esel=document.createElement("select");esel.id="r-edept";esel.dataset.deptsel="1";
+    ew.appendChild(esel);
+    const elab2=el("label",null,"الأقسام المتابع معها (يمكن اختيار أكثر من قسم)");
+    elab2.style.marginTop="8px";ew.appendChild(elab2);
+    const ebox=el("div","deptbox");ebox.id="r-esecs";ew.appendChild(ebox);
+    g.appendChild(ew);
+    fillDeptSelect(esel,(rec&&rec.entity)||"");
+    function drawESecs(){
+      const dv=esel.value;const chosen=[...ebox.querySelectorAll("input:checked")].map(c=>c.value);
+      const pre=rec&&Array.isArray(rec.entitySecs)?rec.entitySecs:[];
+      ebox.innerHTML="";
+      const secs=deptSecs(dv);
+      if(!dv){ebox.appendChild(el("div","mini","اختر الإدارة أولًا."));return}
+      if(!secs.length){ebox.appendChild(el("div","mini","لا توجد أقسام لهذه الإدارة."));return}
+      secs.forEach(sc=>{
+        const l=el("label","deptpick");
+        const c=document.createElement("input");c.type="checkbox";c.value=sc;
+        c.checked=chosen.length?chosen.includes(sc):pre.includes(sc);
+        l.appendChild(c);l.appendChild(document.createTextNode(sc));
+        const r=rec&&rec.replies&&rec.replies[sc];
+        if(r&&r.ok){l.style.background="var(--ok-bg)";l.style.borderColor="#BFE0D2";l.appendChild(el("span","tick","✓"))}
+        ebox.appendChild(l);
+      });
+    }
+    window.drawESecsGlobal=drawESecs;
+    esel.addEventListener("change",drawESecs);drawESecs();
     const dt=el("div","full");dt.innerHTML='<label for="r-det">تفاصيل المهمة</label><textarea id="r-det"></textarea>';g.appendChild(dt);
-    $("#r-entity").onchange=e=>{const f=DB.lists.entities.find(x=>x.name===e.target.value);if(f)$("#r-phone").value=f.phone||""};
+
     if(rec){$("#r-type").value=rec.type;$("#r-title2").value=rec.title;$("#r-start").value=rec.start||"";
       $("#r-due").value=rec.due||"";$("#r-prio").value=rec.prio;$("#r-phone").value=rec.phone||"";$("#r-det").value=rec.det||""}
     else $("#r-start").value=new Date().toISOString().slice(0,10);
@@ -959,7 +997,9 @@ function readRec(){
     return{name:$("#r-name").value.trim(),dept:ds.dept,sec:ds.sec,
       email:$("#r-mail").value.trim(),role:$("#r-role").value}}
   return{type:$("#r-type").value,title:$("#r-title2").value.trim(),start:$("#r-start").value,due:$("#r-due").value,
-    prio:$("#r-prio").value,entity:$("#r-entity").value,phone:$("#r-phone").value.trim(),det:$("#r-det").value.trim()};
+    prio:$("#r-prio").value,entity:$("#r-edept")?$("#r-edept").value:"",
+    entitySecs:[...document.querySelectorAll("#r-esecs input:checked")].map(c=>c.value),
+    phone:$("#r-phone").value.trim(),det:$("#r-det").value.trim()};
 }
 async function saveEverything(){
   await save("dir:contacts",DB.contacts);await save("dir:mails",DB.mails);
@@ -977,7 +1017,8 @@ async function persist(){
 }
 $("#rec-save").onclick=async()=>{
   if(REC_KIND==="memo"){const d=readMemo();if(!d.no&&!d.title)return toast("رقم المذكرة أو العنوان مطلوب");
-    DB.memos.push(Object.assign({id:Date.now(),replies:{}},d));
+    if(!DB.mseq)DB.mseq=1;
+    DB.memos.push(Object.assign({id:Date.now(),seq:DB.mseq++,replies:{}},d));
     await persist();$("#ov-rec").classList.remove("on");return toast("حُفظت المذكرة")}
   const d=readRec();
   if(!d.name&&!d.title)return toast("الاسم مطلوب");
@@ -1074,6 +1115,8 @@ function initFilters(){
     const d=$("#"+k+"-fd"),sc=$("#"+k+"-fs");
     if(!d||d.dataset.init)return;d.dataset.init="1";
     d.addEventListener("change",()=>{fillSecSelect(sc,d.value,"");fn()});
+    d.addEventListener("input",()=>{fillSecSelect(sc,d.value,"");fn()});
+    sc.addEventListener("input",fn);
     sc.addEventListener("change",fn);
   });
 }
@@ -1247,19 +1290,39 @@ function renderTasks(){
       const sq=el("div","seq");sq.appendChild(el("b",null,String(t.seq)));
       sq.appendChild(document.createTextNode("  ·  "+t.type));c.appendChild(sq);
       c.appendChild(el("h3",null,t.title));
+      const pend=(t.entitySecs||[]).filter(x=>!(t.replies&&t.replies[x]&&t.replies[x].ok));
+      if(pend.length){
+        const pl=el("div","chips");pl.style.margin="2px 0 6px";
+        pl.appendChild(el("span","m-lbl","لم يردّ بعد:"));
+        pend.forEach(x=>{const z=el("span","chip lateS");z.textContent=x;pl.appendChild(z)});
+        c.appendChild(pl);
+      }
       const dl=el("dl");const add=(k,v)=>{dl.appendChild(el("dt",null,k));dl.appendChild(el("dd",null,v||"—"))};
       add("البداية",fmt(t.start));
       add("النهاية المتوقعة",t.due?fmt(t.due):fmtD(dueDate(t))+" (تلقائي)");
-      add("الجهة المتابعة",t.entity);add("هاتف التواصل",t.phone);
+      add("الجهة المتابعة",t.entity);
+      if((t.entitySecs||[]).length)add("الأقسام",(t.entitySecs||[]).map(x=>{
+        const r=t.replies&&t.replies[x];return x+(r&&r.ok?" ✓":"")}).join("، "));
+      add("هاتف التواصل",t.phone);
       c.appendChild(dl);
       if(t.det)c.appendChild(el("p","det",t.det));
       const f2=el("div","foot");
       f2.appendChild(el("span","state "+(s.k==="done"?"ok":s.k),s.label));
       f2.appendChild(el("span","prio "+prioCls(t.prio),"أهمية "+t.prio));
+      const reps=(t.entitySecs||[]).filter(x=>t.replies&&t.replies[x]&&t.replies[x].ok);
+      if(reps.length){
+        const rb2=el("div","replybox done");rb2.style.marginTop="8px";
+        rb2.appendChild(el("div","hd","الردود الواردة"));
+        reps.forEach(x=>{const r=t.replies[x];const line=el("div");line.style.fontSize="12.5px";
+          const bb=el("b",null,x+": ");bb.style.color="var(--ok)";line.appendChild(bb);
+          line.appendChild(document.createTextNode((r.text||"—")+(r.date?"  ("+fmt(r.date)+")":"")));rb2.appendChild(line)});
+        c.appendChild(rb2);
+      }
+      const rp=el("button","btn ghost sm","رد الأقسام");rp.onclick=()=>openTaskReplies(t);
       const ed=el("button","btn ghost sm","تعديل");ed.onclick=()=>openRec("task",t);
       const dn=el("button","btn ghost sm",t.done?"إرجاع للمتابعة":"إنجاز");dn.onclick=()=>toggleDone(t);
       const x=el("button","btn danger sm","حذف");x.onclick=()=>delTask(t);
-      f2.appendChild(ed);f2.appendChild(dn);f2.appendChild(x);c.appendChild(f2);cw.appendChild(c);
+      f2.appendChild(rp);f2.appendChild(ed);f2.appendChild(dn);f2.appendChild(x);c.appendChild(f2);cw.appendChild(c);
     });
   }else{
     const b=$("#t-body");b.innerHTML="";
@@ -1272,9 +1335,12 @@ function renderTasks(){
       tr.appendChild(el("td",null,t.due?fmt(t.due):fmtD(dueDate(t))));
       tr.appendChild(el("td",null,t.prio));
       tr.appendChild(el("td",null,t.entity||"—"));
+      tr.appendChild(el("td",null,(t.entitySecs||[]).map(x=>{
+        const r=t.replies&&t.replies[x];return x+(r&&r.ok?" ✓":"")}).join("، ")||"—"));
       tr.appendChild(numCell(t.phone));
       const ts=el("td");ts.appendChild(el("span","state "+(s.k==="done"?"ok":s.k),s.label));tr.appendChild(ts);
       const td=el("td","rowtools");
+      const rp=el("button","btn ghost sm","رد");rp.onclick=()=>openTaskReplies(t);td.appendChild(rp);
       const ed=el("button","btn sm","تعديل");ed.onclick=()=>openRec("task",t);
       const dn=el("button","btn ghost sm",t.done?"إرجاع":"إنجاز");dn.onclick=()=>toggleDone(t);
       const x=el("button","btn danger sm","حذف");x.onclick=()=>delTask(t);
@@ -1284,6 +1350,13 @@ function renderTasks(){
   $("#t-empty").style.display=rows.length?"none":"block";
   $("#t-empty").textContent=showDone?"لا توجد مهام منجزة بعد.":"لا توجد مهام جارية مطابقة.";
   $("#done-n").textContent="("+DB.tasks.filter(t=>t.done).length+")";
+  const tb=$("#t-badges");
+  if(tb){tb.innerHTML="";
+    const mk=(txt,bg)=>{const z=el("span","late-total",txt);z.style.background=bg;z.style.marginInlineStart="6px";tb.appendChild(z)};
+    mk("إجمالي المهام: "+DB.tasks.length,"var(--maroon)");
+    mk("تحت الإنجاز: "+DB.tasks.filter(t=>!t.done).length,"var(--calm)");
+    mk("منجزة: "+DB.tasks.filter(t=>t.done).length,"var(--ok)");
+  }
   $("#view-done").classList.toggle("btn",showDone);
 }
 
@@ -1310,7 +1383,8 @@ function lateUnits(m){
 async function saveMemos(){ await save("dir:memos",DB.memos); renderAll(); }
 
 let MEMO_ID=null;
-function openMemo(m){
+function openMemo(m){try{return __openMemo(m)}catch(e){console.error(e);toast("تعذّر فتح المذكرة: "+e.message)}}
+function __openMemo(m){
   MEMO_ID=m?m.id:null;
   const b=$("#rec-body");b.innerHTML="";const g=el("div","fgrid");b.appendChild(g);
   $("#rec-title").textContent=m?"تعديل مذكرة":"إضافة مذكرة";
@@ -1527,6 +1601,7 @@ function renderMemos(){
 
       /* السطر 1: رقم المذكرة + التاريخ + الحالة */
       const l1=el("div","m-line");
+      const sq=el("span","m-seq",String(m.seq||"—"));l1.appendChild(sq);
       l1.appendChild(el("span","m-lbl","رقم المذكرة"));
       l1.appendChild(el("span","m-no",String(m.no||"—")));
       l1.appendChild(el("span","m-date",fmt(m.date)));
@@ -1603,6 +1678,7 @@ function renderMemos(){
     const b=$("#a-body");b.innerHTML="";
     rows.forEach(m=>{
       const s=memoStatus(m),tr=el("tr",s.k==="lateA"?"soon":"");
+      tr.appendChild(numCell(m.seq));
       tr.appendChild(numCell(m.no));
       tr.appendChild(el("td",null,m.title||"—"));
       tr.appendChild(el("td",null,fmt(m.date)));
@@ -1651,12 +1727,14 @@ function renderMemos(){
   t2.style.background="var(--maroon)";t2.style.marginInlineStart="8px";
   const t3=el("span","late-total","أنجزت: "+DB.memos.filter(m=>m.done).length);
   t3.style.background="var(--ok)";t3.style.marginInlineStart="8px";
-  bd.appendChild(t1);bd.appendChild(t2);bd.appendChild(t3);
+  const t0=el("span","late-total","إجمالي الكتب: "+DB.memos.length);
+  t0.style.background="#111";t0.style.marginInlineStart="8px";
+  bd.appendChild(t0);bd.appendChild(t1);bd.appendChild(t2);bd.appendChild(t3);
   if(!lateAll.length){box.appendChild(el("div","empty","لا توجد مذكرات متأخرة حاليًا."));}
   const list=el("div","late-list");box.appendChild(list);
   lateAll.forEach(m=>{
     const row=el("div","lm");
-    row.appendChild(el("b",null,"#"+(m.no||"—")));
+    row.appendChild(el("b",null,"#"+(m.no||"—")+"  ·  م"+(m.seq||"")));
     const t=el("div","t",m.title||"—");
     const pend=lateUnits(m).concat((m.follow||[]).filter(f=>{
       const k="@"+(f.sec?f.dept+" — "+f.sec:f.dept);
@@ -1700,7 +1778,7 @@ function __printMemos(rows,ttl){
       .filter(x=>x[1]&&x[1].ok&&x[1].text).map(x=>x[0]+": "+x[1].text).join(" | ")||"—";
     const sn=(Array.isArray(m.senders)?m.senders.join("، "):m.sender)||"—";
     const ac=(m.action==="أخرى"&&m.actionOther?m.actionOther:m.action)||"—";
-    return "<tr><td>"+(i+1)+"</td><td>"+(m.no||"—")+"</td><td>"+(m.title||"—")+"</td><td>"+fmt(m.date)
+    return "<tr><td>"+(m.seq||i+1)+"</td><td>"+(m.no||"—")+"</td><td>"+(m.title||"—")+"</td><td>"+fmt(m.date)
       +"</td><td>"+sn+"</td><td>"+ac+"</td><td>"+w+"</td><td>"+fl+"</td><td>"+rt+"</td><td>"+st.label+"</td><td>"+(m.doneNo||"—")+"</td></tr>";
   }).join("");
   const logo=DB.settings.logo||DEF_LOGO;
@@ -1708,16 +1786,17 @@ function __printMemos(rows,ttl){
   const orgSub=DB.settings.appTag||"";
   const lateN=rows.filter(m=>!m.done&&memoStatus(m).k==="lateA").length;
   const html='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>'+ttl+'</title>'
-    +'<style>body{font-family:Tahoma,Arial;padding:18px;color:#22262B}'
-    +'.rep-hd{display:flex;align-items:center;gap:14px;border-bottom:3px solid #8A1538;padding-bottom:10px}'
-    +'.rep-hd img{width:62px;height:62px;object-fit:contain}'
-    +'.rep-hd h1{font-size:20px;color:#8A1538;margin:0}'
-    +'.rep-hd h2{font-size:13px;color:#555;margin:2px 0 0;font-weight:normal}'
-    +'.rep-hd .t{font-size:15px;color:#8A1538;margin-top:6px}'
+    +'<style>@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap");'
+    +'body{font-family:Tajawal,Tahoma,Arial;padding:18px;color:#22262B}'
+    +'.rep-hd{display:flex;align-items:center;gap:14px;background:#14459B;color:#fff;border-radius:10px;padding:12px 16px}'
+    +'.rep-hd img{width:58px;height:58px;object-fit:contain;background:#fff;border-radius:8px;padding:3px}'
+    +'.rep-hd h1{font-size:20px;color:#fff;margin:0}'
+    +'.rep-hd h2{font-size:13px;color:#DCE6F8;margin:2px 0 0;font-weight:normal}'
+    +'.rep-hd .t{font-size:15px;color:#fff;margin-top:6px;font-weight:700}'
     +'.sub{font-size:12px;color:#777;margin:9px 0 13px}'
     +'.late{color:#C0182B;font-weight:bold}'
     +'table{width:100%;border-collapse:collapse;font-size:11.5px}'
-    +'th{background:#8A1538;color:#fff;padding:7px;border:1px solid #8A1538;text-align:right}'
+    +'th{background:#14459B;color:#fff;padding:7px;border:1px solid #14459B;text-align:right}'
     +'td{border:1px solid #ccc;padding:6px;vertical-align:top}tr:nth-child(even) td{background:#FAFAFA}'
     +'@page{size:A4 landscape;margin:10mm}</style></head><body>'
     +'<div class="rep-hd"><img src="'+logo+'"><div><h1>'+org+'</h1>'
@@ -1731,6 +1810,39 @@ function __printMemos(rows,ttl){
   if(!w)return toast("اسمح بالنوافذ المنبثقة للطباعة");
   w.document.write(html);w.document.close();
 };
+
+
+/* ===== ردود أقسام المهمة ===== */
+function openTaskReplies(t){
+  const b=$("#rep-body");b.innerHTML="";
+  $("#rep-title").textContent="ردود الأقسام · "+(t.title||"");
+  const secs=Array.isArray(t.entitySecs)?t.entitySecs:[];
+  if(!secs.length)b.appendChild(el("div","empty","لم تُحدَّد أقسام لهذه المهمة."));
+  secs.forEach(u=>{
+    const r=t.replies&&t.replies[u]?t.replies[u]:{ok:false,text:"",date:""};
+    const box=el("div","replybox"+(r.ok?" done":""));box.dataset.unit=u;
+    const hd=el("div","hd");
+    const c=document.createElement("input");c.type="checkbox";c.style.width="auto";c.className="rep-ok";c.checked=!!r.ok;
+    c.onchange=e=>box.classList.toggle("done",e.target.checked);
+    hd.appendChild(c);hd.appendChild(el("span",null,(t.entity?t.entity+" — ":"")+u));
+    const dt=document.createElement("input");dt.type="date";dt.className="rep-date";dt.style.maxWidth="170px";dt.value=r.date||"";
+    hd.appendChild(dt);box.appendChild(hd);
+    const ta=document.createElement("textarea");ta.className="rep-text";ta.placeholder="نص رد القسم…";ta.value=r.text||"";
+    box.appendChild(ta);b.appendChild(box);
+  });
+  $("#rep-note").textContent="ضع علامة ✓ أمام القسم الذي ردّ.";
+  $("#rep-save").onclick=async()=>{
+    t.replies=t.replies||{};
+    b.querySelectorAll(".replybox").forEach(box=>{
+      const ok=box.querySelector(".rep-ok").checked;
+      t.replies[box.dataset.unit]={ok,text:box.querySelector(".rep-text").value.trim(),
+        date:box.querySelector(".rep-date").value||(ok?new Date().toISOString().slice(0,10):"")};
+    });
+    await save("dir:tasks",{list:DB.tasks,seq:DB.seq});renderAll();
+    $("#ov-rep").classList.remove("on");toast("حُفظت الردود");
+  };
+  $("#ov-rep").classList.add("on");
+}
 
 /* ================= لوحة الإحصائية ================= */
 const ICONS={
@@ -1779,12 +1891,14 @@ $("#s-scope").onchange=renderStats;
 function renderStats(){
   const m=metrics($("#s-scope").value);
   const k=$("#kpis");k.innerHTML="";
-  k.appendChild(statCard("total",m.T.length,"مهمة","إجمالي المهام",""));
-  k.appendChild(statCard("done",m.done.length,"مهمة","المهام المنجزة","",'ok'));
-  k.appendChild(statCard("perf",m.completion,"%","نسبة الإنجاز",""));
-  k.appendChild(statCard("soon",m.soon.length,"مهمة","قاربت على الاستحقاق","",'soon'));
-  k.appendChild(statCard("late",m.late.length,"مهمة","تجاوزت الاستحقاق","",'late'));
-  k.appendChild(statCard("total",m.avg,"يوم","متوسط زمن الإنجاز",""));
+  const kk=[["total",m.T.length,"مهمة","إجمالي المهام",""],
+    ["done",m.done.length,"مهمة","المهام المنجزة","ok"],
+    ["perf",m.completion,"%","نسبة الإنجاز",""],
+    ["soon",m.soon.length,"مهمة","قاربت على الاستحقاق","soon"],
+    ["late",m.late.length,"مهمة","تجاوزت الاستحقاق","late"],
+    ["total",m.avg,"يوم","متوسط زمن الإنجاز",""]];
+  kk.sort((a,b)=>(Number(b[1])||0)-(Number(a[1])||0));
+  kk.forEach(x=>k.appendChild(statCard(x[0],x[1],x[2],x[3],"",x[4])));
 
   const p=$("#perf");p.innerHTML="";
   const rate=m.perf>=85?"ممتاز":m.perf>=70?"جيد":m.perf>=50?"مقبول":"يحتاج متابعة";
@@ -1816,8 +1930,8 @@ function renderStats(){
 /* ================= الإحصائية الجانبية ================= */
 function renderCounters(){
   const m=metrics("all"),c=$("#counters");c.innerHTML="";
-  const add=(icon,v,unit,l,cls)=>{const d=el("div","statcard"+(cls?" "+cls:""));
-    d.innerHTML=svgIcon(icon)+'<span class="v">'+v+(unit?'<small>'+unit+'</small>':'')+'</span><span class="l">'+l+'</span>';c.appendChild(d)};
+  const items=[];
+  const add=(icon,v,unit,l,cls)=>items.push({icon,v,unit,l,cls});
   add("total",m.T.length,"","إجمالي المهام");
   add("soon",m.soon.length,"","قاربت على الاستحقاق","soon");
   add("late",m.late.length,"","تجاوزت الاستحقاق","late");
@@ -1829,6 +1943,10 @@ function renderCounters(){
   add("total",DB.memos.filter(x=>!x.done).length,"","مذكرات تحت المتابعة");
   add("people",DB.contacts.length,"","أرقام الدليل");
   add("mail",DB.mails.length,"","عناوين المراسلة");
+  items.sort((a,b)=>(Number(b.v)||0)-(Number(a.v)||0));
+  items.forEach(it=>{const d=el("div","statcard"+(it.cls?" "+it.cls:""));
+    d.innerHTML=svgIcon(it.icon)+'<span class="v">'+it.v+(it.unit?'<small>'+it.unit+'</small>':'')
+      +'</span><span class="l">'+it.l+'</span>';c.appendChild(d)});
 }
 function renderAll(){initFilters();renderContacts();renderMails();renderTasks();renderMemos();renderStats();renderCounters();fillAllSelects();applyPerms()}
 
@@ -2160,6 +2278,9 @@ async function boot(){
   if(!DB.lists.senders)DB.lists.senders=["مكتب الوكيل","الأرشيف المركزي","الإدارة العامة"];
   if(!DB.lists.actions)DB.lists.actions=["لإجراء اللازم","لإجراء اللازم حسب المطلوب","لرفع الإفادة لمكتب سعادة الوزير","أخرى"];
   DB.memos=await load("dir:memos",[]);
+  let mx=0;DB.memos.forEach(m=>{if(m.seq)mx=Math.max(mx,m.seq)});
+  DB.memos.forEach(m=>{if(!m.seq)m.seq=++mx});
+  DB.mseq=mx+1;
   DB.users=await load("dir:users",DB.users);
   DB.settings=await load("dir:settings",DB.settings);
   const t=await load("dir:tasks",{list:[],seq:1});
