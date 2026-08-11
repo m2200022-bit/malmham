@@ -425,43 +425,52 @@ td.reply-cell{min-width:180px}
 
 <!-- ================= الأرشيف المركزي ونظام الوكيل ================= -->
 <section class="page" id="page-arch">
+  <div class="mtabs" id="arch-tabs" style="margin-bottom:12px">
+    <button class="mtab on" data-asheet="main">المذكرات</button>
+    <button class="mtab" data-asheet="late">المتأخرات <span id="late-count"></span></button>
+  </div>
+
   <div class="panel">
     <div class="panel-head">
       <h2>متابعة الأرشيف المركزي ونظام الوكيل</h2>
-      <button class="icon-btn" id="add-memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>إضافة مذكرة</button>
-      <button class="icon-btn sec" id="refresh-memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>تحديث</button>
-      <label class="icon-btn sec" style="margin:0;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>استيراد من إكسل<input type="file" accept=".xlsx,.xls,.csv" id="imp-memo" style="display:none"></label>
-    </div>
-    <div class="tools">
-      <select id="a-status"><option value="all">كل الحالات</option><option value="open">تحت المتابعة</option><option value="lateA">متأخرة</option><option value="done">أنجزت</option></select>
-      <select id="a-fd" data-deptsel="1" style="max-width:190px"></select>
-      <select id="a-fs" data-secfor="a-fd" style="max-width:180px"></select>
-      <input type="search" id="a-search" placeholder="ابحث برقم المذكرة أو العنوان أو الجهة…">
-      <button class="btn ghost sm" id="av-cards">عرض مربعات</button>
-      <button class="btn ghost sm" id="av-table">عرض جدول</button>
-      <button class="btn ghost sm" id="av-done">المنجزات <span id="adone-n"></span></button>
-      <select id="a-print-scope" style="max-width:170px"><option value="open">طباعة: تحت الإنجاز</option><option value="done">طباعة: أنجزت</option><option value="all">طباعة: الكل</option></select>
-      <button class="icon-btn sec" id="a-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7"/><path d="M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/></svg>طباعة</button>
+      <button class="icon-only" id="add-memo" title="إضافة مذكرة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="icon-only" id="refresh-memo" title="تحديث"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      <label class="icon-only" style="margin:0;cursor:pointer" title="استيراد من إكسل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><input type="file" accept=".xlsx,.xls,.csv" id="imp-memo" style="display:none"></label>
+      <button class="icon-only" id="a-print" title="طباعة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7"/><path d="M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/></svg></button>
+      <button class="icon-only" id="av-toggle" title="تبديل العرض (مربعات / جدول)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
     </div>
 
-    <div class="panel" id="late-panel" style="margin:0 0 14px;background:var(--late-bg);border-color:#EFCBD0">
-      <div class="panel-head"><h2 style="font-size:16px;color:var(--late)">المذكرات المتأخرة</h2>
-        <span id="late-badges"></span></div>
-      <div id="late-depts"></div>
-      <div class="legend" style="margin-top:10px">
-        <span><i style="background:var(--soon)"></i>مذكرة تجاوزت 4 أيام عمل</span>
-        <span><i style="background:var(--ok)"></i>قسم ردّ</span>
-      </div>
+    <!-- شريط البحث في الأعلى -->
+    <div class="tools" style="margin-bottom:6px">
+      <input type="search" id="a-search" placeholder="ابحث برقم المذكرة أو العنوان أو الردود أو الملاحظات…" style="max-width:420px;font-size:15px">
+      <span class="empty" id="a-found" style="padding:0"></span>
     </div>
-    <div>
-      <div>
-        <div class="cards" id="a-cards"></div>
-        <div id="a-tablewrap" style="display:none">
-          <div class="sheet"><div class="scroll"><table>
-            <thead><tr><th>م</th><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th><th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>ردّت</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th><th>إجراءات</th></tr></thead>
-            <tbody id="a-body"></tbody></table></div></div>
-        </div>
-        <div class="empty" id="a-empty">لا توجد مذكرات مطابقة.</div>
+    <div class="tools">
+      <select id="a-view" style="max-width:230px">
+        <option value="open">تحت المتابعة</option>
+        <option value="lateA">المتأخرة</option>
+        <option value="done">المنجزات</option>
+        <option value="all">كل المذكرات</option>
+      </select>
+      <select id="a-fs" style="max-width:220px"></select>
+      <span id="a-badges"></span>
+    </div>
+
+    <div id="asheet-main">
+      <div class="cards" id="a-cards"></div>
+      <div id="a-tablewrap" style="display:none">
+        <div class="sheet"><div class="scroll"><table>
+          <thead><tr><th>م</th><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th><th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>الردود والملاحظات</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th><th>إجراءات</th></tr></thead>
+          <tbody id="a-body"></tbody></table></div></div>
+      </div>
+      <div class="empty" id="a-empty">لا توجد مذكرات مطابقة.</div>
+    </div>
+
+    <div id="asheet-late" style="display:none">
+      <div class="panel" style="margin:0;background:var(--late-bg);border-color:#EFCBD0">
+        <div class="panel-head"><h2 style="font-size:16px;color:var(--late)">المذكرات المتأخرة</h2>
+          <span id="late-badges"></span></div>
+        <div id="late-depts"></div>
       </div>
     </div>
   </div>
@@ -802,14 +811,17 @@ const SEED={"contacts":[{"name":"نور الدين الخطيب","ext":"0875","m
 const mem={};
 const LS=(()=>{try{const t="__t";localStorage.setItem(t,"1");localStorage.removeItem(t);return localStorage}catch(e){return null}})();
 async function load(k,d){
-  /* 1) التخزين السحابي للتطبيق إن وُجد */
-  try{const r=await window.storage.get(k);if(r&&r.value)return JSON.parse(r.value)}catch(e){}
-  /* 2) تخزين المتصفح المحلي */
+  /* 1) تخزين المتصفح المحلي — هو الأحدث دائمًا لأنه يُكتب أولًا */
   try{if(LS){const v=LS.getItem(k);if(v!=null)return JSON.parse(v)}}catch(e){}
+  /* 2) تخزين التطبيق */
+  try{const r=await window.storage.get(k);if(r&&r.value)return JSON.parse(r.value)}catch(e){}
   /* 3) الذاكرة */
   return (k in mem)?mem[k]:d;
 }
-const PENDING={};let flushT=null;
+const PENDING={};const STAMP={};let flushT=null;
+function stampOf(k){if(STAMP[k])return STAMP[k];
+  try{const v=LS&&LS.getItem("ts:"+k);if(v)return STAMP[k]=Number(v)||0}catch(e){}return 0}
+function setStamp(k,t){STAMP[k]=t;try{if(LS)LS.setItem("ts:"+k,String(t))}catch(e){}}
 function scheduleFlush(){
   clearTimeout(flushT);
   flushT=setTimeout(async()=>{
@@ -817,10 +829,10 @@ function scheduleFlush(){
     for(const k of keys){const v=PENDING[k];delete PENDING[k];
       try{await pushKey(k,v)}catch(e){PENDING[k]=v}}
     if(Object.keys(PENDING).length)scheduleFlush();
-  },700);
+  },400);
 }
 async function save(k,v){
-  mem[k]=v;
+  mem[k]=v;setStamp(k,Date.now());
   const json=JSON.stringify(v);
   let okLocal=false;
   try{if(LS){LS.setItem(k,json);okLocal=true}}catch(e){}
@@ -1292,8 +1304,7 @@ $("#u-apply").onclick=async()=>{
 /* ===== فلاتر الإدارة/القسم في كل الصفحات ===== */
 function initFilters(){
   if($("#m-fd")&&!$("#m-fd").dataset.dw){$("#m-fd").dataset.dw="1";fillDawaDept($("#m-fd"),"");$("#m-fd").value=""}
-  if($("#a-fd")&&!$("#a-fd").dataset.dw){$("#a-fd").dataset.dw="1";fillDawaDept($("#a-fd"),"");$("#a-fd").value=""}
-  [["c",renderContacts],["m",renderMails],["a",renderMemos]].forEach(([k,fn])=>{
+  [["c",renderContacts],["m",renderMails]].forEach(([k,fn])=>{
     const d=$("#"+k+"-fd"),sc=$("#"+k+"-fs");
     if(!d||d.dataset.init)return;d.dataset.init="1";
     d.addEventListener("change",()=>{fillSecSelect(sc,d.value,"");fn()});
@@ -1590,12 +1601,14 @@ function __openMemo(m){
   g.appendChild(field("a-title","العنوان"));
   g.appendChild(field("a-date","التاريخ","date"));
   /* الإجراء المطلوب — قائمة منسدلة قابلة للزيادة */
-  g.appendChild(selectField("a-action","الإجراء المطلوب","actions",m&&m.action));
+  g.appendChild(selectField("a-action","الإجراء المطلوب","actions",(m&&m.action)||"لإجراء اللازم"));
   const othW=field("a-action-oth","تفاصيل «أخرى»");g.appendChild(othW);
   const togOth=()=>{const av=$("#a-action");othW.style.display=(av&&av.value==="أخرى")?"":"none"};
   const stt=el("div");stt.innerHTML='<label for="a-state">الحالة</label><select id="a-state"><option value="open">تحت المتابعة</option><option value="done">أنجزت</option></select>';
   g.appendChild(stt);
   const doneWrap=field("a-donno","رقم مذكرة الإنجاز");g.appendChild(doneWrap);
+  const nw2=el("div","full");nw2.innerHTML='<label for="a-notes">الملاحظات</label><textarea id="a-notes"></textarea>';
+  g.appendChild(nw2);
   /* الجهة المرسلة — مربعات اختيار متعددة */
   const sw=el("div","full");
   const shd=el("div");shd.style.display="flex";shd.style.alignItems="center";shd.style.gap="8px";
@@ -1713,7 +1726,7 @@ function __openMemo(m){
   if($("#a-action"))$("#a-action").onchange=togOth;
   if(m){$("#a-no").value=m.no||"";$("#a-title").value=m.title||"";$("#a-date").value=m.date||"";
     $("#a-state").value=m.done?"done":"open";$("#a-donno").value=m.doneNo||"";
-    $("#a-action-oth").value=m.actionOther||""}
+    $("#a-action-oth").value=m.actionOther||"";$("#a-notes").value=m.notes||""}
   else $("#a-date").value=new Date().toISOString().slice(0,10);
   togOth();
   $("#ov-rec").classList.add("on");
@@ -1723,6 +1736,7 @@ function readMemo(){
   return{no:$("#a-no").value.trim(),title:$("#a-title").value.trim(),date:$("#a-date").value,
     senders,sender:senders.join("، "),
     action:$("#a-action").value,actionOther:($("#a-action-oth").value||"").trim(),
+    notes:(($("#a-notes")&&$("#a-notes").value)||"").trim(),
     follow:(window.__follow||[]).slice(),
     done:$("#a-state").value==="done",doneNo:$("#a-donno").value.trim(),
     waiting:[...document.querySelectorAll("#a-units input:checked")].map(c=>c.value)};
@@ -1758,13 +1772,26 @@ function openReplies(m){
   $("#ov-rep").classList.add("on");
 }
 $("#add-memo").onclick=()=>openMemo(null);
-$("#refresh-memo").onclick=async()=>{await boot();toast("حُدّثت البيانات")};
-["#a-status"].forEach(x=>$(x).onchange=renderMemos);
+$("#refresh-memo").onclick=async()=>{
+  try{
+    DB.memos=await load("dir:memos",DB.memos);
+    DB.lists=await load("dir:lists",DB.lists);
+    if(SYNC.ready){SYNC.last={};listen()}
+    renderAll();toast("حُدّثت البيانات");
+  }catch(e){toast("تعذّر التحديث: "+e.message)}
+};
+document.querySelectorAll("#arch-tabs .mtab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#arch-tabs .mtab").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+  const late=b.dataset.asheet==="late";
+  $("#asheet-main").style.display=late?"none":"block";
+  $("#asheet-late").style.display=late?"block":"none";
+  renderMemos();
+});
+["#a-view","#a-fs"].forEach(x=>{const n=$(x);if(n)n.onchange=renderMemos});
 $("#a-search").oninput=renderMemos;
-let aview="cards",aDone=false;
-$("#av-cards").onclick=()=>{aview="cards";aDone=false;renderMemos()};
-$("#av-table").onclick=()=>{aview="table";aDone=false;renderMemos()};
-$("#av-done").onclick=()=>{aDone=!aDone;renderMemos();toast(aDone?"عرض المذكرات المنجزة":"عرض المذكرات الجارية")};
+let aview="cards";
+$("#av-toggle").onclick=()=>{aview=aview==="cards"?"table":"cards";renderMemos()};
 
 function chipFor(m,u){
   const r=m.replies&&m.replies[u];
@@ -1775,15 +1802,28 @@ function chipFor(m,u){
   return c;
 }
 function renderMemos(){
-  const st=$("#a-status").value,q=$("#a-search").value.trim();
+  const view=($("#a-view")&&$("#a-view").value)||"open";
+  const q=($("#a-search")&&$("#a-search").value.trim())||"";
+  const fs=($("#a-fs")&&$("#a-fs").value)||"";
   const RK={lateA:0,open:1,done:2};
-  const fd=$("#a-fd")?$("#a-fd").value:"",fs=$("#a-fs")?$("#a-fs").value:"";
-  const rows=DB.memos.filter(m=>aDone?m.done:!m.done)
-    .filter(m=>!fd||(m.follow||[]).some(f=>f.dept===fd&&(!fs||f.sec===fs)))
-    .filter(m=>st==="all"||memoStatus(m).k===st)
-    .filter(m=>!q||[m.no,m.title,m.sender,m.action,m.actionOther,m.doneNo].join(" ").includes(q))
-    .sort((a,b)=>RK[memoStatus(a).k]-RK[memoStatus(b).k]||workdaysSince(b.date)-workdaysSince(a.date));
-
+  const txtOf=m=>{
+    const reps=[];
+    Object.keys(m.replies||{}).forEach(k=>{const r=m.replies[k];if(r&&(r.text||r.ok))reps.push(k+" "+(r.text||""))});
+    return [m.no,m.ref,m.title,m.sender,m.action,m.actionOther,m.doneNo,m.notes,(m.waiting||[]).join(" "),
+      (m.follow||[]).map(f=>f.dept+" "+f.sec).join(" "),reps.join(" ")].join(" ");
+  };
+  const base=DB.memos
+    .filter(m=>view==="all"?true:view==="done"?m.done:view==="lateA"?(!m.done&&memoStatus(m).k==="lateA"):!m.done)
+    .filter(m=>!fs||(m.follow||[]).some(f=>f.sec===fs))
+    .filter(m=>!q||txtOf(m).includes(q));
+  /* البحث برقم مذكرة يعرض النتائج مهما كانت حالتها */
+  const rows=(q&&!base.length)
+    ? DB.memos.filter(m=>txtOf(m).includes(q))
+    : base;
+  rows.sort((a,b)=>RK[memoStatus(a).k]-RK[memoStatus(b).k]||workdaysSince(b.date)-workdaysSince(a.date));
+  if($("#a-found"))$("#a-found").textContent=q?("نتائج البحث: "+rows.length):"";
+  /* قائمة الأقسام: إدارة الدعوة فقط */
+  fillSel($("#a-fs"),deptSecs(DAWA),"كل أقسام إدارة الدعوة والإرشاد الديني");
   const cw=$("#a-cards");cw.innerHTML="";
   cw.style.display=aview==="cards"?"grid":"none";
   $("#a-tablewrap").style.display=aview==="table"?"block":"none";
@@ -1850,6 +1890,12 @@ function renderMemos(){
         c.appendChild(rb2);
       }
 
+      if(m.notes){
+        const nb=el("div","replybox");nb.style.marginTop="6px";
+        nb.appendChild(el("div","hd","الملاحظات"));
+        nb.appendChild(el("div",null,m.notes));
+        c.appendChild(nb);
+      }
       /* الأزرار كأيقونات */
       const f=el("div","foot");
       const rb=ico('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>');
@@ -1882,13 +1928,18 @@ function renderMemos(){
       tr.appendChild(el("td",null,(m.action==="أخرى"&&m.actionOther?m.actionOther:m.action)||"—"));
       const wt=el("td","reply-cell");const ch=el("div","chips");
       (m.waiting||[]).forEach(u=>ch.appendChild(chipFor(m,u)));wt.appendChild(ch);tr.appendChild(wt);
+      const rt=el("td");const reps2=[];
+      Object.keys(m.replies||{}).forEach(k=>{const r=m.replies[k];
+        if(r&&r.ok)reps2.push(k.replace(/^@/,"")+": "+(r.text||"—"))});
+      if(m.notes)reps2.push("ملاحظات: "+m.notes);
+      rt.appendChild(el("div",null,reps2.join(" | ")||"—"));rt.style.minWidth="220px";
       const ft=el("td","reply-cell");const ch3=el("div","chips");
       (m.follow||[]).forEach(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;
         const r=m.replies&&m.replies["@"+nm];
         const c=el("span","chip"+(r&&r.ok?" replied":" b-blue"));c.textContent=nm;
         if(r&&r.ok)c.appendChild(el("span","tick","✓"));ch3.appendChild(c)});
       if(!ch3.children.length)ch3.appendChild(el("span","mini","—"));
-      ft.appendChild(ch3);tr.appendChild(ft);
+      ft.appendChild(ch3);tr.appendChild(ft);tr.appendChild(rt);
       const rp=el("td","reply-cell");const ch2=el("div","chips");
       (m.waiting||[]).filter(u=>m.replies&&m.replies[u]&&m.replies[u].ok).forEach(u=>ch2.appendChild(chipFor(m,u)));
       if(!ch2.children.length)ch2.appendChild(el("span","mini","—"));
@@ -1910,13 +1961,20 @@ function renderMemos(){
     });
   }
   $("#a-empty").style.display=rows.length?"none":"block";
-  $("#a-empty").textContent=aDone?"لا توجد مذكرات منجزة بعد.":"لا توجد مذكرات جارية مطابقة.";
-  $("#adone-n").textContent="("+DB.memos.filter(m=>m.done).length+")";
-  $("#late-panel").style.display=aDone?"none":"block";
+  $("#a-empty").textContent="لا توجد مذكرات مطابقة.";
+
+
 
   const box=$("#late-depts");box.innerHTML="";
   const lateAll=DB.memos.filter(m=>!m.done&&memoStatus(m).k==="lateA")
     .sort((a,b)=>workdaysSince(b.date)-workdaysSince(a.date));
+  const lc=$("#late-count");
+  if(lc)lc.textContent="("+DB.memos.filter(m=>!m.done&&memoStatus(m).k==="lateA").length+")";
+  const ab=$("#a-badges");
+  if(ab){ab.innerHTML="";
+    const mk3=(t,bg)=>{const z=el("span","late-total",t);z.style.background=bg;z.style.marginInlineStart="6px";ab.appendChild(z)};
+    mk3("المعروض: "+rows.length,"var(--maroon)");
+    mk3("إجمالي الكتب: "+DB.memos.length,"#111");}
   const bd=$("#late-badges");bd.innerHTML="";
   const openN=DB.memos.filter(m=>!m.done).length;
   const t1=el("span","late-total","المتأخرة: "+lateAll.length);
@@ -1957,11 +2015,11 @@ function printMemos(rows,ttl){
   __printMemos(rows,ttl);
 }
 $("#a-print").onclick=()=>{
-  const sc=$("#a-print-scope").value;
-  const rows=DB.memos.filter(m=>sc==="all"?true:sc==="done"?m.done:!m.done)
+  const sc=($("#a-view")&&$("#a-view").value)||"open";
+  const rows=DB.memos.filter(m=>sc==="all"?true:sc==="done"?m.done:sc==="lateA"?(!m.done&&memoStatus(m).k==="lateA"):!m.done)
     .sort((a,b)=>(a.no||"").localeCompare(b.no||""));
   if(!rows.length)return toast("لا توجد مذكرات للطباعة");
-  const ttl=sc==="done"?"المذكرات المنجزة":sc==="open"?"المذكرات تحت الإنجاز":"جميع المذكرات";
+  const ttl=sc==="done"?"المذكرات المنجزة":sc==="lateA"?"المذكرات المتأخرة":sc==="open"?"المذكرات تحت الإنجاز":"جميع المذكرات";
   __printMemos(rows,ttl);
 };
 function __printMemos(rows,ttl){
@@ -1970,9 +2028,10 @@ function __printMemos(rows,ttl){
     const w=(m.waiting||[]).map(u=>u+((m.replies&&m.replies[u]&&m.replies[u].ok)?" ✓":"")).join("، ")||"—";
     const fl=(m.follow||[]).map(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;
       const r=m.replies&&m.replies["@"+nm];return nm+(r&&r.ok?" ✓":"")}).join("، ")||"—";
+    const nts=m.notes?("ملاحظات: "+m.notes):"";
     const rt=[].concat((m.waiting||[]).map(u=>[u,m.replies&&m.replies[u]]),
       (m.follow||[]).map(f=>{const nm=f.sec?f.dept+" — "+f.sec:f.dept;return [nm,m.replies&&m.replies["@"+nm]]}))
-      .filter(x=>x[1]&&x[1].ok&&x[1].text).map(x=>x[0]+": "+x[1].text).join(" | ")||"—";
+      .filter(x=>x[1]&&x[1].ok&&x[1].text).map(x=>x[0]+": "+x[1].text).concat(nts?[nts]:[]).join(" | ")||"—";
     const sn=(Array.isArray(m.senders)?m.senders.join("، "):m.sender)||"—";
     const ac=(m.action==="أخرى"&&m.actionOther?m.actionOther:m.action)||"—";
     return "<tr><td>"+(m.seq||i+1)+"</td><td>"+(m.no||"—")+"</td><td>"+(m.title||"—")+"</td><td>"+fmt(m.date)
@@ -2001,7 +2060,7 @@ function __printMemos(rows,ttl){
     +'<div class="sub">تاريخ الطباعة: '+fmtD(new Date())+' · عدد المذكرات: '+rows.length
     +' · <span class="late">المتأخرة: '+lateN+'</span></div>'
     +'<table><thead><tr><th>م</th><th>رقم المذكرة</th><th>العنوان</th><th>التاريخ</th><th>الجهة المرسلة</th>'
-    +'<th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>ردود الجهات</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th></tr></thead><tbody>'+body+'</tbody></table>'
+    +'<th>الإجراء المطلوب</th><th>انتظار الرد من</th><th>المتابعة مع</th><th>الردود والملاحظات</th><th>الحالة</th><th>رقم مذكرة الإنجاز</th></tr></thead><tbody>'+body+'</tbody></table>'
     +'<script>onload=()=>{print();}<\/script></body></html>';
   const w=window.open("","_blank");
   if(!w)return toast("اسمح بالنوافذ المنبثقة للطباعة");
@@ -2958,8 +3017,9 @@ const firebaseConfig={
   appId:"1:183460755575:web:9e5021291185c8408b2e72",
   measurementId:"G-FYLY6DYZGQ"
 };
-const APP_BUILD="2026-08-11-A";
-const SYNC={db:null,ready:false,space:"office-1",last:{},unsub:[],authErr:""};
+const APP_BUILD="2026-08-11-C";
+const DEVICE_ID=(()=>{try{let d=LS&&LS.getItem("deviceId");if(!d){d="d"+Math.random().toString(36).slice(2,10);LS&&LS.setItem("deviceId",d)}return d}catch(e){return "d0"}})();
+const SYNC={db:null,ready:false,loaded:false,space:"office-1",last:{},unsub:[],authErr:""};
 const KEYS=["dir:contacts","dir:mails","dir:tasks","dir:memos","dir:lists","dir:users","dir:settings",
   "dir:plan_strat","dir:plan_exec","dir:plan_events","dir:plan_monthly","dir:plan_lists","dir:plan_cols"];
 const docId=k=>k.replace(/[:/]/g,"_");
@@ -2973,9 +3033,17 @@ function setSync(state,txt){
   [["#sync-dot","#sync-txt"],["#sync-dot2","#sync-txt2"]].forEach(([d,t])=>{
     const dd=$(d),tt=$(t);if(!dd)return;dd.className="dot "+state;if(tt)tt.textContent=txt});
 }
-function applyRemote(key,json){
+function applyRemote(key,json,remoteAt){
+  if(!SYNC.loaded)return;                    /* لا نطبّق شيئًا قبل اكتمال التحميل المحلي */
   if(SYNC.last[key]===json)return;
+  const localAt=stampOf(key);
+  if(localAt&&remoteAt&&remoteAt<localAt){   /* السحابة أقدم: ارفع المحلي بدل استبداله */
+    PENDING[key]=mem[key];scheduleFlush();return;
+  }
+  if(PENDING[key])return;                    /* هناك تعديل محلي لم يُرفع بعد */
   SYNC.last[key]=json;mem[key]=JSON.parse(json);
+  if(remoteAt)setStamp(key,remoteAt);
+  try{if(LS)LS.setItem(key,json)}catch(e){}
   const v=mem[key];
   if(key==="dir:contacts")DB.contacts=v;
   else if(key==="dir:mails")DB.mails=v;
@@ -3013,7 +3081,7 @@ async function pushKey(key,val){
   SYNC.last[key]=json;
   try{
     await SYNC.db.collection("spaces").doc(SYNC.space).collection("data").doc(docId(key))
-      .set({json,updatedAt:Date.now()},{merge:true});
+      .set({json,updatedAt:stampOf(key)||Date.now(),device:DEVICE_ID},{merge:true});
     const d=new Date();
     setSync("on","متزامن "+pad(d.getHours())+":"+pad(d.getMinutes())+" · "+SYNC.space);
   }catch(e){
@@ -3028,7 +3096,7 @@ function listen(){
     const ref=SYNC.db.collection("spaces").doc(SYNC.space).collection("data").doc(docId(k));
     SYNC.unsub.push(ref.onSnapshot(snap=>{
       if(!snap.exists)return;
-      const d=snap.data();if(d&&d.json)applyRemote(k,d.json);
+      const d=snap.data();if(d&&d.json)applyRemote(k,d.json,Number(d.updatedAt)||0);
       setSync("on","متزامن · "+SYNC.space);
     },err=>setSync("off",err&&err.code==="permission-denied"?"مرفوض: راجع قواعد Firestore":"انقطع التزامن")));
   });
@@ -3122,7 +3190,9 @@ $("#sp-diag").onclick=async()=>{
     if(c==="not-found"||c==="failed-precondition")L.push("الحل: أنشئ قاعدة Firestore في المشروع");
   }
   L.push("الحفظ المحلي: "+(LS?"يعمل ✓":"غير متاح"));
-  L.push("عناصر بانتظار الرفع: "+Object.keys(PENDING).length);
+  L.push("عناصر بانتظار الرفع: "+(Object.keys(PENDING).join("، ")||"لا شيء"));
+  L.push("آخر حفظ للمراسلات: "+(stampOf("dir:mails")?new Date(stampOf("dir:mails")).toLocaleString("ar-EG"):"—"));
+  L.push("عدد عناوين المراسلة: "+DB.mails.length);
   alert(L.join("\n"));
 };
 
@@ -3413,6 +3483,7 @@ async function boot(){
     DB.tasks=t.list||[];DB.seq=t.seq||DB.tasks.length+1;
     if(permFix)await save("dir:users",DB.users);
   }catch(e){console.error("load",e);toast("تحذير أثناء تحميل البيانات: "+e.message)}
+  SYNC.loaded=true;
   /* 3) الزرع والصيانة — كل خطوة مستقلة */
   for(const step of [["seedData",()=>seedData(false)],["seedPlan",()=>seedPlan(false)],
       ["autoStatus",()=>autoStatus()],["pruneUnits",()=>pruneUnits()]]){
