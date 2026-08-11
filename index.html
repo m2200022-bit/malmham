@@ -320,7 +320,7 @@ td.reply-cell{min-width:180px}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     الإعدادات</button>
   <div class="divider"></div>
-  <div class="whoami">المستخدم الحالي<b id="cur-user">—</b></div>
+  <div class="whoami">المستخدم الحالي<b id="cur-user">—</b><span class="mini" id="build-tag"></span></div>
   <div class="synced" id="sync-chip" style="cursor:pointer" title="اضغط لإعادة المحاولة"><span class="dot wait" id="sync-dot"></span><span id="sync-txt">جارٍ الاتصال…</span></div>
   <button class="btn ghost sm" id="logout" style="margin-top:10px;width:100%">قفل البرنامج</button>
 </aside>
@@ -752,6 +752,7 @@ td.reply-cell{min-width:180px}
         <button class="btn ghost sm" id="sp-export">تصدير نسخة احتياطية</button>
         <button class="btn ghost sm" id="sp-test">فحص الحفظ</button>
         <button class="btn ghost sm" id="sp-reconnect">إعادة الاتصال بالسحابة</button>
+        <button class="btn ghost sm" id="sp-diag">تشخيص السحابة</button>
         <button class="btn ghost sm" id="sp-seed">إعادة تحميل بيانات الملفين</button>
         <label class="btn ghost sm" style="margin:0;display:inline-flex;align-items:center;cursor:pointer">استيراد نسخة
           <input id="sp-import" type="file" accept="application/json" style="display:none"></label>
@@ -808,6 +809,16 @@ async function load(k,d){
   /* 3) الذاكرة */
   return (k in mem)?mem[k]:d;
 }
+const PENDING={};let flushT=null;
+function scheduleFlush(){
+  clearTimeout(flushT);
+  flushT=setTimeout(async()=>{
+    const keys=Object.keys(PENDING);
+    for(const k of keys){const v=PENDING[k];delete PENDING[k];
+      try{await pushKey(k,v)}catch(e){PENDING[k]=v}}
+    if(Object.keys(PENDING).length)scheduleFlush();
+  },700);
+}
 async function save(k,v){
   mem[k]=v;
   const json=JSON.stringify(v);
@@ -815,7 +826,7 @@ async function save(k,v){
   try{if(LS){LS.setItem(k,json);okLocal=true}}catch(e){}
   try{await window.storage.set(k,json);okLocal=true}catch(e){}
   if(!okLocal){console.warn("تعذّر الحفظ المحلي للمفتاح",k);try{toast("تحذير: تعذّر الحفظ المحلي")}catch(e){}}
-  try{if(k!=="dir:space")await pushKey(k,v)}catch(e){}
+  if(k!=="dir:space"){PENDING[k]=v;scheduleFlush()}
 }
 const DEF_LOGO=document.getElementById("app-logo").src;
 const DB={contacts:[],mails:[],tasks:[],seq:1,
@@ -1171,7 +1182,7 @@ async function saveEverything(){
   await save("dir:memos",DB.memos);await save("dir:lists",DB.lists);
   await save("dir:users",DB.users);await save("dir:settings",DB.settings);
   await save("dir:tasks",{list:DB.tasks,seq:DB.seq});
-  await save("dir:plan",DB.plan);
+  await savePlanParts();
 }
 async function persist(){
   if(REC_KIND==="memo")await save("dir:memos",DB.memos);
@@ -1206,7 +1217,11 @@ $("#rec-update").onclick=async()=>{
 $("#add-contact").onclick=()=>openRec("contact",null);
 $("#add-mail").onclick=()=>openRec("mail",null);
 $("#add-task").onclick=()=>openRec("task",null);
-$("#refresh-contact").onclick=$("#refresh-mail").onclick=$("#refresh-task").onclick=async()=>{await boot();toast("حُدّثت البيانات")};
+$("#refresh-contact").onclick=$("#refresh-mail").onclick=$("#refresh-task").onclick=async()=>{await addEventListener("beforeunload",()=>{
+  try{const keys=Object.keys(PENDING);keys.forEach(k=>{if(LS)LS.setItem(k,JSON.stringify(PENDING[k]))})}catch(e){}
+});
+setInterval(()=>{if(SYNC.ready&&Object.keys(PENDING).length)scheduleFlush()},15000);
+boot();toast("حُدّثت البيانات")};
 
 /* ================= الإعدادات ================= */
 $("#open-settings").onclick=()=>{
@@ -2045,7 +2060,13 @@ const CANON_SECS=["الإرشاد الديني","القرآن الكريم وع�
   "معهد الدعوة والعلوم الإسلامية","النشاط النسائي لشؤون الدعوة و العلوم الإسلامية",
   "النشاط النسائي لشؤون القرآن الكريم وعلومه"];
 const dawaSecs=()=>CANON_SECS;
-async function savePlan(){await save("dir:plan",DB.plan);renderPlan()}
+async function savePlanParts(pushOnly){
+  const parts=[["dir:plan_strat",DB.plan.strat],["dir:plan_exec",DB.plan.exec],
+    ["dir:plan_events",DB.plan.events||[]],["dir:plan_monthly",DB.plan.monthly||[]],
+    ["dir:plan_lists",DB.plan.lists],["dir:plan_cols",DB.plan.cols||{}]];
+  for(const [k,v] of parts){ if(pushOnly)await pushKey(k,v); else await save(k,v); }
+}
+async function savePlan(){await savePlanParts();renderPlan()}
 
 /* ---- تبويبات الأوراق ---- */
 document.querySelectorAll("#plan-tabs .mtab").forEach(b=>b.onclick=()=>{
@@ -2069,7 +2090,7 @@ function ps(id,label,opts,val,addKey){
     b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
     b.onclick=async()=>{const n=prompt("أضف عنصرًا جديدًا:");if(!n)return;const v=n.trim();if(!v)return;
       if(!DB.plan.lists[addKey].includes(v))DB.plan.lists[addKey].push(v);
-      await save("dir:plan",DB.plan);
+      await savePlanParts();
       const cur=sel.value;sel.innerHTML="";sel.appendChild(new Option("— اختر —",""));
       DB.plan.lists[addKey].forEach(o=>sel.appendChild(new Option(o,o)));sel.value=v||cur;toast("أُضيف العنصر")};
     w.appendChild(b)}
@@ -2252,7 +2273,7 @@ function openExec(rec){
       const nadd=el("button","btn ghost sm","إضافة نتيجة وطنية");nadd.type="button";
       nadd.onclick=async()=>{const n=prompt("اسم النتيجة الوطنية:");if(!n)return;const v=n.trim();if(!v)return;
         if(!DB.plan.lists.national.includes(v))DB.plan.lists.national.push(v);
-        await save("dir:plan",DB.plan);drawNat();toast("أُضيفت النتيجة")};
+        await savePlanParts();drawNat();toast("أُضيفت النتيجة")};
       nw.appendChild(nadd);g.appendChild(nw);
       function drawNat(){
         const chosen=[...nbox.querySelectorAll("input:checked")].map(c=>c.value);
@@ -2813,7 +2834,7 @@ async function autoStatus(){
     if(st<=t&&(!en||en>=t)){if(e.status!=="جاري التنفيذ"){e.status="جاري التنفيذ";ch=true}}
     else if(st>t){if(e.status!=="لم يبدأ"){e.status="لم يبدأ";ch=true}}
   });
-  if(ch)await save("dir:plan",DB.plan);
+  if(ch)await savePlanParts();
 }
 
 function renderPlan(){
@@ -2937,14 +2958,17 @@ const firebaseConfig={
   appId:"1:183460755575:web:9e5021291185c8408b2e72",
   measurementId:"G-FYLY6DYZGQ"
 };
-const SYNC={db:null,ready:false,space:"office-1",last:{},unsub:[]};
-const KEYS=["dir:contacts","dir:mails","dir:tasks","dir:memos","dir:lists","dir:users","dir:settings","dir:plan"];
+const APP_BUILD="2026-08-11-A";
+const SYNC={db:null,ready:false,space:"office-1",last:{},unsub:[],authErr:""};
+const KEYS=["dir:contacts","dir:mails","dir:tasks","dir:memos","dir:lists","dir:users","dir:settings",
+  "dir:plan_strat","dir:plan_exec","dir:plan_events","dir:plan_monthly","dir:plan_lists","dir:plan_cols"];
 const docId=k=>k.replace(/[:/]/g,"_");
 if($("#sync-chip"))$("#sync-chip").onclick=async()=>{
   if(SYNC.ready){await pushAll();return toast("تمت المزامنة")}
   setSync("wait","جارٍ إعادة الاتصال…");
   try{await initSync();if(SYNC.ready){await pushAll();toast("تم الاتصال")}}catch(e){toast("خطأ: "+e.message)}
 };
+if($("#build-tag"))$("#build-tag").textContent="إصدار "+APP_BUILD;
 function setSync(state,txt){
   [["#sync-dot","#sync-txt"],["#sync-dot2","#sync-txt2"]].forEach(([d,t])=>{
     const dd=$(d),tt=$(t);if(!dd)return;dd.className="dot "+state;if(tt)tt.textContent=txt});
@@ -2959,7 +2983,12 @@ function applyRemote(key,json){
   else if(key==="dir:lists")DB.lists=v;
   else if(key==="dir:users")DB.users=v;
   else if(key==="dir:settings"){DB.settings=v;applyBrand()}
-  else if(key==="dir:plan")DB.plan=v;
+  else if(key==="dir:plan_strat")DB.plan.strat=v;
+  else if(key==="dir:plan_exec")DB.plan.exec=v;
+  else if(key==="dir:plan_events")DB.plan.events=v;
+  else if(key==="dir:plan_monthly")DB.plan.monthly=v;
+  else if(key==="dir:plan_lists")DB.plan.lists=v;
+  else if(key==="dir:plan_cols")DB.plan.cols=v;
   else if(key==="dir:tasks"){DB.tasks=v.list||[];DB.seq=v.seq||DB.tasks.length+1}
   try{renderAll()}catch(e){}
 }
@@ -3009,7 +3038,7 @@ async function pushAll(){
   await pushKey("dir:memos",DB.memos);await pushKey("dir:lists",DB.lists);
   await pushKey("dir:users",DB.users);await pushKey("dir:settings",DB.settings);
   await pushKey("dir:tasks",{list:DB.tasks,seq:DB.seq});
-  await pushKey("dir:plan",DB.plan);
+  await savePlanParts(true);
 }
 async function initSync(){
   if(!window.firebase||!firebase.initializeApp){setSync("off","حفظ محلي فقط (تعذّر تحميل Firebase)");return}
@@ -3018,12 +3047,38 @@ async function initSync(){
     SYNC.db=firebase.firestore();
     try{await SYNC.db.enablePersistence({synchronizeTabs:true})}catch(e){}
     try{SYNC.space=(await load("dir:space","office-1"))||"office-1"}catch(e){}
+    const AUTH_TXT={
+      "auth/operation-not-allowed":"فعّل Anonymous في Authentication",
+      "auth/configuration-not-found":"لم تُفعّل خدمة Authentication في المشروع",
+      "auth/api-key-not-valid":"مفتاح API غير صالح لهذا المشروع",
+      "auth/admin-restricted-operation":"الدخول المجهول مقيَّد في المشروع",
+      "auth/network-request-failed":"لا يوجد اتصال بالشبكة",
+      "auth/unauthorized-domain":"النطاق غير مصرّح به في Authentication"
+    };
+    let authed=false;
+    for(let i=0;i<2&&!authed;i++){
+      try{await firebase.auth().signInAnonymously();authed=true}
+      catch(e){
+        SYNC.authErr=(e&&e.code)||"";
+        if(i===1)setSync("wait",(AUTH_TXT[SYNC.authErr]||"تعذّر الدخول المجهول")+" — جارٍ المحاولة بدون مصادقة");
+        await new Promise(r=>setTimeout(r,600));
+      }
+    }
+    /* حتى لو فشلت المصادقة نجرّب الكتابة: قد تسمح قواعد Firestore بذلك */
+    SYNC.ready=true;
     try{
-      await firebase.auth().signInAnonymously();
+      await SYNC.db.collection("spaces").doc(SYNC.space).collection("data").doc("__ping")
+        .set({t:Date.now()},{merge:true});
     }catch(e){
-      setSync("off",e&&e.code==="auth/operation-not-allowed"
-        ?"فعّل Anonymous في Firebase Authentication"
-        :"تعذّر تسجيل الدخول للسحابة — الحفظ محلي");
+      SYNC.ready=false;
+      const c=(e&&e.code)||"";
+      setSync("off",(c==="permission-denied"
+        ?(authed?"مرفوض: قواعد Firestore ترفض الكتابة":"مرفوض: "+(AUTH_TXT[SYNC.authErr]||"الدخول المجهول غير مفعّل"))
+        :c==="unavailable"?"لا يوجد اتصال — سيُرفع لاحقًا"
+        :"تعذّر الحفظ في السحابة")+(c?" ["+c+"]":""));
+      /* إعادة محاولة دورية */
+      clearInterval(SYNC.retry);
+      SYNC.retry=setInterval(async()=>{try{if(!SYNC.ready)await initSync()}catch(_){}} ,60000);
       return;
     }
     SYNC.ready=true;setSync("wait","جارٍ المزامنة…");
@@ -3038,6 +3093,39 @@ $("#sp-save").onclick=async()=>{
   if(SYNC.ready){listen();await pushAll()}
   toast("مساحة العمل: "+v);
 };
+
+$("#sp-diag").onclick=async()=>{
+  const L=[];
+  L.push("إصدار البرنامج: "+APP_BUILD);
+  L.push("المشروع: "+firebaseConfig.projectId);
+  L.push("مساحة العمل: "+SYNC.space);
+  L.push("مكتبة Firebase: "+(window.firebase?"محمّلة":"غير محمّلة"));
+  let u=null;
+  try{u=firebase.auth().currentUser}catch(e){}
+  L.push("المستخدم السحابي: "+(u?("مسجّل "+(u.isAnonymous?"(مجهول)":"")):"غير مسجّل"));
+  if(!u){
+    try{await firebase.auth().signInAnonymously();L.push("الدخول المجهول: نجح الآن")}
+    catch(e){L.push("الدخول المجهول: فشل ["+((e&&e.code)||"?")+"]")}
+  }
+  try{
+    await SYNC.db.collection("spaces").doc(SYNC.space).collection("data").doc("__ping")
+      .set({t:Date.now()},{merge:true});
+    L.push("الكتابة في Firestore: نجحت ✓");
+    const sn=await SYNC.db.collection("spaces").doc(SYNC.space).collection("data").get();
+    L.push("عدد المستندات في مساحتك: "+sn.size);
+    SYNC.ready=true;setSync("on","متزامن · "+SYNC.space);
+  }catch(e){
+    const c=(e&&e.code)||"?";
+    L.push("الكتابة في Firestore: فشلت ["+c+"]");
+    if(c==="permission-denied")L.push("الحل: انشر قاعدة Firestore التي تسمح للمستخدمين المسجّلين");
+    if(c==="unauthenticated")L.push("الحل: فعّل Anonymous في Authentication");
+    if(c==="not-found"||c==="failed-precondition")L.push("الحل: أنشئ قاعدة Firestore في المشروع");
+  }
+  L.push("الحفظ المحلي: "+(LS?"يعمل ✓":"غير متاح"));
+  L.push("عناصر بانتظار الرفع: "+Object.keys(PENDING).length);
+  alert(L.join("\n"));
+};
+
 $("#sp-reconnect").onclick=async()=>{
   SYNC.ready=false;SYNC.last={};setSync("wait","جارٍ إعادة الاتصال…");
   try{await initSync();if(SYNC.ready){await pushAll();toast("أُعيد الاتصال ورُفعت البيانات")}
@@ -3284,7 +3372,7 @@ async function seedPlan(force){
     if(DB.plan.exec.some(x=>x.name===r.name))return;
     const c=JSON.parse(JSON.stringify(r));c.sec=canonSec(c.sec);
     DB.plan.exec.push(Object.assign({id:t++},c));});
-  await save("dir:lists",DB.lists);await save("dir:plan",DB.plan);await save("dir:planSeeded","v2");
+  await save("dir:lists",DB.lists);await savePlanParts();await save("dir:planSeeded","v2");
 }
 
 /* ================= الإقلاع ================= */
@@ -3301,7 +3389,14 @@ async function boot(){
     if(!DB.lists.senders)DB.lists.senders=["مكتب الوكيل","الأرشيف المركزي","الإدارة العامة"];
     if(!DB.lists.actions)DB.lists.actions=["لإجراء اللازم","لإجراء اللازم حسب المطلوب","لرفع الإفادة لمكتب سعادة الوزير","أخرى"];
     DB.memos=await load("dir:memos",[]);
-    DB.plan=await load("dir:plan",DB.plan);
+    const legacy=await load("dir:plan",null);
+    if(legacy&&(legacy.strat||legacy.exec))DB.plan=legacy;
+    DB.plan.strat=await load("dir:plan_strat",DB.plan.strat||[]);
+    DB.plan.exec=await load("dir:plan_exec",DB.plan.exec||[]);
+    DB.plan.events=await load("dir:plan_events",DB.plan.events||[]);
+    DB.plan.monthly=await load("dir:plan_monthly",DB.plan.monthly||[]);
+    DB.plan.lists=await load("dir:plan_lists",DB.plan.lists||{});
+    DB.plan.cols=await load("dir:plan_cols",DB.plan.cols||{});
     ["strat","exec","events","monthly"].forEach(k=>{if(!Array.isArray(DB.plan[k]))DB.plan[k]=[]});
     if(!DB.plan.lists)DB.plan.lists={refs:[],statuses:[],national:[],kpis:[]};
     ["refs","statuses","national","kpis","amiri","stratLinks"].forEach(k=>{if(!Array.isArray(DB.plan.lists[k]))DB.plan.lists[k]=[]});
