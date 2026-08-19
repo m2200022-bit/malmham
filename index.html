@@ -406,9 +406,12 @@ td.reply-cell{min-width:180px}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     الإعدادات</button>
   <div class="divider"></div>
+  <button class="tab" id="open-restore" data-perm="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 8v5l3 2"/></svg>
+    استرجاع البيانات</button>
   <button class="tab" id="open-inbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
     الإشعارات <span id="inbox-n" class="mini"></span></button>
   <div class="whoami">المستخدم الحالي<b id="cur-user">—</b><span class="mini" id="build-tag"></span></div>
+  <button class="tab" id="sync-help" style="display:none;font-size:12px">كيف أُفعّل المزامنة؟</button>
   <div class="synced" id="sync-chip" style="cursor:pointer" title="اضغط لإعادة المحاولة"><span class="dot wait" id="sync-dot"></span><span id="sync-txt">جارٍ الاتصال…</span></div>
   <button class="btn ghost sm" id="logout" style="margin-top:10px;width:100%">قفل البرنامج</button>
 </aside>
@@ -1017,6 +1020,33 @@ td.reply-cell{min-width:180px}
     <button class="btn ghost" data-close="ov-inbox">إغلاق</button></footer>
 </div></div>
 
+<!-- ===== نافذة قواعد المزامنة ===== -->
+<div class="overlay" id="ov-rules"><div class="modal" style="max-width:640px" role="dialog" aria-modal="true">
+  <header><h3>تفعيل المزامنة — الملف يعمل محليًا</h3><button class="icon-only" data-close="ov-rules" aria-label="إغلاق">✕</button></header>
+  <div class="body">
+    <div class="scope-note" style="margin-bottom:12px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      <span>لأنك تفتح البرنامج كملف على جهازك، لا يسمح Firebase بتسجيل الدخول، فترفض القواعد الكتابة. اختر أحد الحلّين:</span>
+    </div>
+    <b style="color:var(--primary-dark)">الحل السريع — فتح القواعد (للاستخدام الداخلي)</b>
+    <p class="empty" style="padding:4px 0 8px">انسخ القاعدة التالية والصقها في: Firestore Database ← Rules ← Publish</p>
+    <textarea id="rules-text" readonly style="min-height:150px;direction:ltr;text-align:left;font-family:monospace;font-size:12px"></textarea>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm" id="rules-copy">نسخ القاعدة</button>
+      <a class="btn ghost sm" id="rules-open" target="_blank">فتح صفحة القواعد</a>
+    </div>
+    <p class="empty" style="color:var(--coral);padding:8px 0 0">تنبيه: هذه القاعدة تفتح البيانات لمن يعرف معرّف المشروع — استخدمها داخليًا فقط.</p>
+    <hr style="border:0;border-top:1px solid var(--border);margin:14px 0">
+    <b style="color:var(--primary-dark)">الحل الأفضل — رفع الملف على استضافة</b>
+    <p class="empty" style="padding:4px 0 0">سمِّ الملف index.html ثم:<br>
+      <code style="direction:ltr;display:inline-block;background:var(--surface-alt);padding:6px 10px;border-radius:6px;margin-top:6px">
+      npm i -g firebase-tools → firebase login → firebase init hosting → firebase deploy</code><br>
+      وبعدها تعمل المزامنة بالقواعد الآمنة (request.auth != null) دون فتحها.</p>
+  </div>
+  <footer><button class="btn ghost" data-close="ov-rules">إغلاق</button>
+    <span class="empty" id="rules-note" style="padding:0"></span></footer>
+</div></div>
+
 <!-- ===== نافذة إدارة الأقسام ===== -->
 <div class="overlay" id="ov-secs"><div class="modal" style="max-width:560px" role="dialog" aria-modal="true">
   <header><h3>أقسام إدارة الدعوة والإرشاد الديني</h3><button class="icon-only" data-close="ov-secs" aria-label="إغلاق">✕</button></header>
@@ -1064,6 +1094,7 @@ td.reply-cell{min-width:180px}
       <button class="mtab" data-pane="p-lists">القوائم</button>
       <button class="mtab" data-pane="p-reqs">طلبات الحسابات <span id="reqs-n"></span></button>
       <button class="mtab" data-pane="p-sync">التزامن والنسخ</button>
+      <button class="mtab" data-pane="p-restore">استرجاع البيانات</button>
     </div>
 
     <div class="mpane on" id="p-brand">
@@ -1134,12 +1165,27 @@ td.reply-cell{min-width:180px}
         <button class="btn ghost sm" id="sp-export">تصدير نسخة احتياطية</button>
         <button class="btn ghost sm" id="sp-test">فحص الحفظ</button>
         <button class="btn ghost sm" id="sp-reconnect">إعادة الاتصال بالسحابة</button>
+        <button class="btn ghost sm" id="sp-load">إعادة تحميل مكتبة المزامنة</button>
         <button class="btn ghost sm" id="sp-diag">تشخيص السحابة</button>
+        <label style="display:flex;align-items:center;gap:7px;margin:0;font-size:13px;color:var(--ink)">
+          <input type="checkbox" id="sp-noauth" style="width:auto"> مزامنة بلا مصادقة (للملف المحلي)</label>
         <button class="btn ghost sm" id="sp-seed">إعادة تحميل بيانات الملفين</button>
         <label class="btn ghost sm" style="margin:0;display:inline-flex;align-items:center;cursor:pointer">استيراد نسخة
           <input id="sp-import" type="file" accept="application/json" style="display:none"></label>
       </div>
       <p class="empty">التزامن عبر Firebase Firestore — أي تعديل من أي جهاز يظهر مباشرة على بقية الأجهزة المرتبطة بنفس مساحة العمل.</p>
+    </div>
+
+    <div class="mpane" id="p-restore">
+      <p class="empty" style="padding:0 0 10px">نسخ تلقائية تُحفظ في هذا الجهاز عند كل تغيير مهم — اختر نسخة لاستعادتها.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn sm" id="rs-now">حفظ نسخة الآن</button>
+        <button class="btn ghost sm" id="rs-cloud">استرجاع من السحابة</button>
+        <label class="btn ghost sm" style="margin:0;cursor:pointer">استيراد ملف نسخة
+          <input type="file" id="rs-file" accept="application/json" style="display:none"></label>
+        <button class="btn ghost sm" id="rs-scan">فحص التخزين عن بيانات مفقودة</button>
+      </div>
+      <div id="rs-list"></div>
     </div>
 
     <div class="mpane" id="p-lists">
@@ -1650,7 +1696,7 @@ $("#open-settings").onclick=()=>{
   $("#s-name").value=DB.settings.appName;$("#s-tag").value=DB.settings.appTag;
   $("#ad-user").value=adminCreds().u;$("#ad-pass").value="";
   if($("#s-schlink"))$("#s-schlink").value=DB.settings.schoolsLink||"";
-  renderUsers();renderReqs();$("#ov-set").classList.add("on");
+  renderUsers();renderReqs();renderSnaps();$("#ov-set").classList.add("on");
 };
 $("#s-brand-save").onclick=async()=>{
   DB.settings.appName=$("#s-name").value.trim()||"متابعات مكتب مساعد المدير";
@@ -4386,6 +4432,198 @@ function renderPlan(){
 
 
 
+
+/* ================= النسخ والاسترجاع ================= */
+const SNAP_KEYS=["dir:contacts","dir:mails","dir:tasks","dir:memos","dir:schools","dir:schMeta",
+  "dir:plan_strat","dir:plan_exec","dir:plan_events","dir:plan_monthly","dir:plan_lists",
+  "dir:lists","dir:users","dir:settings","dir:msgs","dir:reqs"];
+function snapList(){
+  try{return JSON.parse((LS&&LS.getItem("snapIndex"))||"[]")}catch(e){return []}
+}
+function snapCounts(d){
+  const n=x=>Array.isArray(x)?x.length:0;
+  return{contacts:n(d["dir:contacts"]),mails:n(d["dir:mails"]),
+    tasks:n((d["dir:tasks"]||{}).list),memos:n(d["dir:memos"]),
+    schools:n(d["dir:schools"]),exec:n(d["dir:plan_exec"]),strat:n(d["dir:plan_strat"])};
+}
+async function takeSnapshot(tag){
+  if(!LS)return null;
+  try{
+    const data={};
+    for(const k of SNAP_KEYS){const v=await load(k,null);if(v!=null)data[k]=v}
+    const c=snapCounts(data);
+    const total=c.contacts+c.mails+c.tasks+c.memos+c.schools+c.exec+c.strat;
+    if(!total)return null;
+    const id="snap:"+Date.now();
+    const rec={id,at:new Date().toISOString(),tag:tag||"تلقائي",counts:c,total,
+      user:(curUser()?curUser().name:"—")};
+    const json=JSON.stringify(data);
+    if(json.length>3500000)return null;
+    LS.setItem(id,json);
+    let idx=snapList();
+    /* تفادي نسخ متطابقة متتالية */
+    if(idx.length&&idx[0].total===total&&Date.now()-new Date(idx[0].at).getTime()<120000)return idx[0];
+    idx.unshift(rec);
+    while(idx.length>20){const old=idx.pop();try{LS.removeItem(old.id)}catch(e){}}
+    LS.setItem("snapIndex",JSON.stringify(idx));
+    renderSnaps();
+    return rec;
+  }catch(e){console.warn("snapshot",e);return null}
+}
+function renderSnaps(){
+  const box=$("#rs-list");if(!box)return;
+  const idx=snapList();box.innerHTML="";
+  if(!idx.length){box.appendChild(el("div","empty","لا توجد نسخ محفوظة بعد."));return}
+  idx.forEach(r=>{
+    const row=el("div","list-item");
+    const nm=el("div","nm",new Date(r.at).toLocaleString("ar-EG")+"  ·  "+r.tag);
+    const c=r.counts||{};
+    nm.appendChild(el("span","sub",
+      "أرقام: "+(c.contacts||0)+" · مراسلات: "+(c.mails||0)+" · مهام: "+(c.tasks||0)
+      +" · مذكرات: "+(c.memos||0)+" · مدارس: "+(c.schools||0)+" · مشاريع: "+(c.exec||0)
+      +"  |  بواسطة: "+(r.user||"—")));
+    row.appendChild(nm);
+    const v=el("button","btn ghost sm","معاينة");
+    v.onclick=()=>{
+      let d={};try{d=JSON.parse(LS.getItem(r.id)||"{}")}catch(e){}
+      const c2=snapCounts(d);
+      alert("محتوى النسخة — "+new Date(r.at).toLocaleString("ar-EG")+"\n\n"
+        +"أرقام الدليل: "+c2.contacts+"\nعناوين المراسلة: "+c2.mails
+        +"\nالمهام: "+c2.tasks+"\nالمذكرات: "+c2.memos
+        +"\nفعاليات المدارس: "+c2.schools+"\nمشاريع الخطة: "+c2.exec
+        +"\nمدخلات استراتيجية: "+c2.strat);
+    };
+    const b=el("button","btn sm","استرجاع");
+    b.onclick=()=>restoreSnap(r);
+    const d2=el("button","icon-only");d2.title="حذف النسخة";d2.style.color="var(--coral)";
+    d2.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
+    d2.onclick=()=>{if(!ask("حذف هذه النسخة؟"))return;
+      try{LS.removeItem(r.id)}catch(e){}
+      LS.setItem("snapIndex",JSON.stringify(snapList().filter(x=>x.id!==r.id)));renderSnaps()};
+    row.appendChild(v);row.appendChild(b);row.appendChild(d2);
+    box.appendChild(row);
+  });
+}
+async function applyData(data,label){
+  const cur=snapCounts({"dir:contacts":DB.contacts,"dir:mails":DB.mails,
+    "dir:tasks":{list:DB.tasks},"dir:memos":DB.memos,"dir:schools":DB.schools,
+    "dir:plan_exec":(DB.plan||{}).exec,"dir:plan_strat":(DB.plan||{}).strat});
+  const nw=snapCounts(data);
+  if(!ask("استرجاع "+(label||"النسخة")+"؟\n\n"
+    +"الحالي → المسترجع\n"
+    +"الأرقام: "+cur.contacts+" → "+nw.contacts+"\n"
+    +"المراسلات: "+cur.mails+" → "+nw.mails+"\n"
+    +"المهام: "+cur.tasks+" → "+nw.tasks+"\n"
+    +"المذكرات: "+cur.memos+" → "+nw.memos+"\n"
+    +"المدارس: "+cur.schools+" → "+nw.schools+"\n"
+    +"المشاريع: "+cur.exec+" → "+nw.exec+"\n\nسيتم حفظ نسخة من الوضع الحالي قبل الاسترجاع."))return false;
+  await takeSnapshot("قبل الاسترجاع");
+  for(const k of SNAP_KEYS){if(data[k]!=null)await save(k,data[k])}
+  /* إعادة التحميل إلى الذاكرة */
+  DB.contacts=await load("dir:contacts",DB.contacts);
+  DB.mails=await load("dir:mails",DB.mails);
+  DB.memos=await load("dir:memos",DB.memos);
+  DB.schools=await load("dir:schools",DB.schools);
+  DB.schMeta=await load("dir:schMeta",DB.schMeta);
+  DB.lists=await load("dir:lists",DB.lists);
+  DB.users=await load("dir:users",DB.users);
+  DB.msgs=await load("dir:msgs",DB.msgs);
+  DB.reqs=await load("dir:reqs",DB.reqs);
+  const t=await load("dir:tasks",{list:DB.tasks,seq:DB.seq});
+  DB.tasks=t.list||DB.tasks;DB.seq=t.seq||DB.seq;
+  DB.plan.strat=await load("dir:plan_strat",DB.plan.strat);
+  DB.plan.exec=await load("dir:plan_exec",DB.plan.exec);
+  DB.plan.events=await load("dir:plan_events",DB.plan.events);
+  DB.plan.monthly=await load("dir:plan_monthly",DB.plan.monthly);
+  DB.plan.lists=await load("dir:plan_lists",DB.plan.lists);
+  audit("استرجاع","نسخة احتياطية",label||"");
+  renderAll();
+  alert("تم الاسترجاع بنجاح.\nراجع الصفحات للتأكد، ويمكنك التراجع باسترجاع نسخة «قبل الاسترجاع».");
+  return true;
+}
+function restoreSnap(r){
+  let d={};try{d=JSON.parse(LS.getItem(r.id)||"{}")}catch(e){return toast("تعذّرت قراءة النسخة")}
+  applyData(d,"نسخة "+new Date(r.at).toLocaleString("ar-EG"));
+}
+if($("#rs-now"))$("#rs-now").onclick=async()=>{
+  const r=await takeSnapshot("يدوي");
+  toast(r?"حُفظت نسخة الآن":"تعذّر حفظ النسخة");
+};
+if($("#rs-cloud"))$("#rs-cloud").onclick=async()=>{
+  if(!SYNC.ready)return toast("السحابة غير متصلة — فعّل المزامنة أولًا");
+  try{
+    const snap=await SYNC.db.collection("spaces").doc(SYNC.space).collection("data").get();
+    const data={};
+    snap.forEach(doc=>{
+      const key="dir:"+String(doc.id).replace(/^dir_/,"").replace(/_/g,"_");
+      const raw=(doc.data()||{}).json;
+      if(!raw)return;
+      try{data[key]=JSON.parse(raw)}catch(e){}
+    });
+    /* توحيد المفاتيح مع أسماء التخزين */
+    const fixed={};
+    Object.keys(data).forEach(k=>{
+      const base=k.replace(/^dir:/,"");
+      fixed["dir:"+base]=data[k];
+    });
+    if(!Object.keys(fixed).length)return toast("لا توجد بيانات في السحابة");
+    await applyData(fixed,"نسخة السحابة ("+SYNC.space+")");
+  }catch(e){toast("تعذّر السحب: "+((e&&e.code)||e.message))}
+};
+if($("#rs-file"))$("#rs-file").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async()=>{
+    try{
+      const d=JSON.parse(r.result);
+      const map={};
+      if(d["dir:contacts"]!==undefined)Object.assign(map,d);
+      else{
+        if(d.contacts)map["dir:contacts"]=d.contacts;
+        if(d.mails)map["dir:mails"]=d.mails;
+        if(d.tasks)map["dir:tasks"]={list:d.tasks,seq:d.seq||d.tasks.length+1};
+        if(d.memos)map["dir:memos"]=d.memos;
+        if(d.schools)map["dir:schools"]=d.schools;
+        if(d.lists)map["dir:lists"]=d.lists;
+        if(d.users)map["dir:users"]=d.users;
+        if(d.settings)map["dir:settings"]=d.settings;
+        if(d.plan){map["dir:plan_strat"]=d.plan.strat;map["dir:plan_exec"]=d.plan.exec;
+          map["dir:plan_events"]=d.plan.events;map["dir:plan_monthly"]=d.plan.monthly;
+          map["dir:plan_lists"]=d.plan.lists}
+      }
+      await applyData(map,"ملف النسخة");
+    }catch(err){toast("ملف غير صالح")}
+    e.target.value="";
+  };
+  r.readAsText(f);
+};
+if($("#rs-scan"))$("#rs-scan").onclick=async()=>{
+  if(!LS)return toast("التخزين المحلي غير متاح");
+  const found=[];
+  for(let i=0;i<LS.length;i++){
+    const k=LS.key(i);
+    if(!k||k.indexOf("dir:")!==0)continue;
+    try{
+      const v=JSON.parse(LS.getItem(k));
+      const n=Array.isArray(v)?v.length:(v&&v.list?v.list.length:(v&&typeof v==="object"?Object.keys(v).length:0));
+      if(n)found.push(k+": "+n);
+    }catch(e){}
+  }
+  const snaps=snapList().length;
+  alert("فحص التخزين المحلي\n\n"+(found.length?found.join("\n"):"لا توجد بيانات")
+    +"\n\nالنسخ المحفوظة: "+snaps
+    +"\n\nإن كان الرقم هنا أكبر مما يظهر في الشاشة، استرجع أحدث نسخة من القائمة.");
+};
+if($("#open-restore"))$("#open-restore").onclick=()=>{
+  document.querySelectorAll(".mtab").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".mpane").forEach(x=>x.classList.remove("on"));
+  const t=document.querySelector('[data-pane="p-restore"]');if(t)t.classList.add("on");
+  const pn=$("#p-restore");if(pn)pn.classList.add("on");
+  renderSnaps();$("#ov-set").classList.add("on");
+};
+/* نسخ تلقائية: عند الإقلاع وكل 10 دقائق */
+setInterval(()=>{takeSnapshot("تلقائي")},600000);
+
 /* ================= الرسائل الداخلية ومركز الإشعارات ================= */
 async function sendMsg(secs,subject,body){
   DB.msgs=DB.msgs||[];
@@ -5274,7 +5512,7 @@ const firebaseConfig={
   appId:"1:183460755575:web:9e5021291185c8408b2e72",
   measurementId:"G-FYLY6DYZGQ"
 };
-const APP_BUILD="2026-08-19-D";
+const APP_BUILD="2026-08-19-J";
 const DEVICE_ID=(()=>{try{let d=LS&&LS.getItem("deviceId");if(!d){d="d"+Math.random().toString(36).slice(2,10);LS&&LS.setItem("deviceId",d)}return d}catch(e){return "d0"}})();
 const SYNC={db:null,ready:false,loaded:false,space:"office-1",last:{},unsub:[],authErr:""};
 const KEYS=["dir:contacts","dir:mails","dir:tasks","dir:memos","dir:lists","dir:users","dir:settings",
@@ -5286,9 +5524,64 @@ if($("#sync-chip"))$("#sync-chip").onclick=async()=>{
   try{await initSync();if(SYNC.ready){await pushAll();toast("تم الاتصال")}}catch(e){toast("خطأ: "+e.message)}
 };
 if($("#build-tag"))$("#build-tag").textContent="إصدار "+APP_BUILD;
+
+
+/* ===== نافذة قواعد المزامنة ===== */
+const OPEN_RULES="rules_version = '2';\n"
+ +"service cloud.firestore {\n"
+ +"  match /databases/{database}/documents {\n"
+ +"    match /spaces/{space}/data/{doc} {\n"
+ +"      allow read, write: if true;\n"
+ +"    }\n  }\n}";
+function openRulesBox(){
+  const t=$("#rules-text");if(t)t.value=OPEN_RULES;
+  const a=$("#rules-open");
+  if(a)a.href="https://console.firebase.google.com/project/"+firebaseConfig.projectId+"/firestore/rules";
+  $("#rules-note").textContent="المشروع: "+firebaseConfig.projectId;
+  $("#ov-rules").classList.add("on");
+}
+if($("#rules-copy"))$("#rules-copy").onclick=async()=>{
+  const t=$("#rules-text");t.select();
+  try{await navigator.clipboard.writeText(OPEN_RULES);toast("نُسخت القاعدة")}
+  catch(e){try{document.execCommand("copy");toast("نُسخت القاعدة")}catch(_){toast("حدّد النص وانسخه يدويًا")}}
+};
+
+/* ===== دليل تفعيل المزامنة ===== */
+function syncHelp(){
+  const pid=firebaseConfig.projectId;
+  alert(
+"تفعيل المزامنة السحابية — مشروع: "+pid+"\n"+
+"بيئة التشغيل: "+ORIGIN_TXT+"\n"+
+(IS_FILE?"⚠ أنت تفتح الملف مباشرة من الجهاز (file://)\n   Firebase يرفض المصادقة من هذا المصدر.\n   الحل الأسرع: فعّل «مزامنة بلا مصادقة» من الإعدادات مع قاعدة allow read, write: if true;\n   الحل الأفضل: ارفع الملف على Firebase Hosting.\n\n":"")+
+"الرمز الحالي: "+(SYNC.diagCode||SYNC.authErr||"غير متصل")+"\n"+
+"—————————————————————\n"+
+"1) إنشاء قاعدة البيانات\n"+
+"   Firebase Console ← Build ← Firestore Database ← Create database\n"+
+"   اختر الموقع ثم Start in production mode\n\n"+
+"2) تفعيل الدخول المجهول\n"+
+"   Build ← Authentication ← Get started\n"+
+"   Sign-in method ← Anonymous ← Enable ← Save\n\n"+
+"3) نشر قواعد الأمان\n"+
+"   Firestore Database ← Rules ← الصق التالي ← Publish:\n\n"+
+"rules_version = '2';\n"+
+"service cloud.firestore {\n"+
+"  match /databases/{database}/documents {\n"+
+"    match /spaces/{space}/data/{doc} {\n"+
+"      allow read, write: if request.auth != null;\n"+
+"    }\n"+
+"  }\n"+
+"}\n\n"+
+"4) أضف نطاق موقعك في:\n"+
+"   Authentication ← Settings ← Authorized domains\n\n"+
+"ثم اضغط «إعادة الاتصال بالسحابة» من الإعدادات.\n"+
+"ملاحظة: بياناتك محفوظة محليًا ولن تُفقد قبل تفعيل المزامنة.");
+}
+if($("#sync-help"))$("#sync-help").onclick=()=>{if(IS_FILE)openRulesBox();else syncHelp()};
+
 function setSync(state,txt){
   [["#sync-dot","#sync-txt"],["#sync-dot2","#sync-txt2"]].forEach(([d,t])=>{
     const dd=$(d),tt=$(t);if(!dd)return;dd.className="dot "+state;if(tt)tt.textContent=txt});
+  const hb=$("#sync-help");if(hb)hb.style.display=(state==="off")?"block":"none";
 }
 function applyRemote(key,json,remoteAt){
   if(!SYNC.loaded)return;                    /* لا نطبّق شيئًا قبل اكتمال التحميل المحلي */
@@ -5375,23 +5668,91 @@ async function pushAll(){
   await pushKey("dir:tasks",{list:DB.tasks,seq:DB.seq});
   await savePlanParts(true);
 }
+
+/* ================= تحميل Firebase مع بدائل ================= */
+function loadScript(src,ms){
+  return new Promise((res,rej)=>{
+    const t=setTimeout(()=>rej(new Error("timeout")),ms||9000);
+    const el2=document.createElement("script");
+    el2.src=src;el2.async=false;
+    el2.onload=()=>{clearTimeout(t);res(src)};
+    el2.onerror=()=>{clearTimeout(t);rej(new Error("error"))};
+    document.head.appendChild(el2);
+  });
+}
+async function ensureFirebase(){
+  if(window.firebase&&firebase.initializeApp&&firebase.firestore)return true;
+  const V="10.12.2";
+  const SETS=[
+    ["https://www.gstatic.com/firebasejs/"+V+"/firebase-app-compat.js",
+     "https://www.gstatic.com/firebasejs/"+V+"/firebase-auth-compat.js",
+     "https://www.gstatic.com/firebasejs/"+V+"/firebase-firestore-compat.js"],
+    ["https://cdn.jsdelivr.net/npm/firebase@"+V+"/firebase-app-compat.js",
+     "https://cdn.jsdelivr.net/npm/firebase@"+V+"/firebase-auth-compat.js",
+     "https://cdn.jsdelivr.net/npm/firebase@"+V+"/firebase-firestore-compat.js"],
+    ["https://unpkg.com/firebase@"+V+"/firebase-app-compat.js",
+     "https://unpkg.com/firebase@"+V+"/firebase-auth-compat.js",
+     "https://unpkg.com/firebase@"+V+"/firebase-firestore-compat.js"]
+  ];
+  for(const set of SETS){
+    try{
+      setSync("wait","جارٍ تحميل مكتبة المزامنة…");
+      for(const u of set)await loadScript(u,9000);
+      if(window.firebase&&firebase.initializeApp&&firebase.firestore){
+        SYNC.cdn=set[0].split("/")[2];return true;
+      }
+    }catch(e){/* جرّب المصدر التالي */}
+  }
+  return false;
+}
+
+const IS_FILE=(location.protocol==="file:");
+const ORIGIN_TXT=IS_FILE?"ملف محلي (file://)":location.origin;
 async function initSync(){
-  if(!window.firebase||!firebase.initializeApp){setSync("off","حفظ محلي فقط (تعذّر تحميل Firebase)");return}
+  if(!window.firebase||!firebase.initializeApp||!firebase.firestore){
+    const ok=await ensureFirebase();
+    if(!ok){
+      setSync("off",navigator.onLine
+        ?"تعذّر تحميل مكتبة المزامنة — قد تحجبها شبكة الجهة"
+        :"لا يوجد اتصال بالإنترنت — الحفظ محلي");
+      clearInterval(SYNC.retry);
+      SYNC.retry=setInterval(async()=>{try{if(!SYNC.ready&&navigator.onLine)await initSync()}catch(_){}} ,45000);
+      return;
+    }
+  }
   try{
     if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
     SYNC.db=firebase.firestore();
-    try{await SYNC.db.enablePersistence({synchronizeTabs:true})}catch(e){}
+    /* التخزين المحلي لـ Firestore: الطريقة الحديثة أولًا ثم القديمة */
+    try{
+      const F=firebase.firestore;
+      if(F.persistentLocalCache&&F.persistentMultipleTabManager){
+        SYNC.db.settings({localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})});
+        SYNC.cache="modern";
+      }else{
+        await SYNC.db.enablePersistence({synchronizeTabs:true});
+        SYNC.cache="legacy";
+      }
+    }catch(e){
+      if(e&&e.code==="failed-precondition")SYNC.cache="tab-conflict";
+      else if(e&&e.code==="unimplemented")SYNC.cache="unsupported";
+      else{try{await SYNC.db.enablePersistence({synchronizeTabs:true});SYNC.cache="legacy"}catch(_){SYNC.cache="off"}}
+    }
     try{SYNC.space=(await load("dir:space","office-1"))||"office-1"}catch(e){}
     const AUTH_TXT={
       "auth/operation-not-allowed":"فعّل Anonymous في Authentication",
-      "auth/configuration-not-found":"لم تُفعّل خدمة Authentication في المشروع",
+      "auth/configuration-not-found":"فعّل Authentication ← Anonymous",
       "auth/api-key-not-valid":"مفتاح API غير صالح لهذا المشروع",
       "auth/admin-restricted-operation":"الدخول المجهول مقيَّد في المشروع",
       "auth/network-request-failed":"لا يوجد اتصال بالشبكة",
       "auth/unauthorized-domain":"النطاق غير مصرّح به في Authentication"
     };
     let authed=false;
-    for(let i=0;i<2&&!authed;i++){
+    if(IS_FILE){
+      setSync("wait","الملف يعمل محليًا — جارٍ محاولة الاتصال بلا مصادقة");
+    }
+    const skipAuth=IS_FILE||DB.settings.syncNoAuth;
+    for(let i=0;i<(skipAuth?0:2)&&!authed;i++){
       try{await firebase.auth().signInAnonymously();authed=true}
       catch(e){
         SYNC.authErr=(e&&e.code)||"";
@@ -5407,8 +5768,11 @@ async function initSync(){
     }catch(e){
       SYNC.ready=false;
       const c=(e&&e.code)||"";
+      SYNC.diagCode=c;
+      if(c==="permission-denied"&&IS_FILE&&!SYNC.rulesShown){SYNC.rulesShown=true;setTimeout(openRulesBox,700)}
       setSync("off",(c==="permission-denied"
-        ?(authed?"مرفوض: قواعد Firestore ترفض الكتابة":"مرفوض: "+(AUTH_TXT[SYNC.authErr]||"الدخول المجهول غير مفعّل"))
+        ?(IS_FILE?"الملف محلي — اضغط «كيف أُفعّل المزامنة؟» للحل"
+          :authed?"مرفوض: قواعد Firestore ترفض الكتابة":"مرفوض: "+(AUTH_TXT[SYNC.authErr]||"الدخول المجهول غير مفعّل"))
         :c==="unavailable"?"لا يوجد اتصال — سيُرفع لاحقًا"
         :"تعذّر الحفظ في السحابة")+(c?" ["+c+"]":""));
       /* إعادة محاولة دورية */
@@ -5432,9 +5796,16 @@ $("#sp-save").onclick=async()=>{
 $("#sp-diag").onclick=async()=>{
   const L=[];
   L.push("إصدار البرنامج: "+APP_BUILD);
+  L.push("بيئة التشغيل: "+ORIGIN_TXT);
+  if(IS_FILE)L.push("⚠ Firebase لا يسمح بالمصادقة من ملف محلي — ارفع الملف على استضافة أو فعّل «مزامنة بلا مصادقة»");
   L.push("المشروع: "+firebaseConfig.projectId);
   L.push("مساحة العمل: "+SYNC.space);
-  L.push("مكتبة Firebase: "+(window.firebase?"محمّلة":"غير محمّلة"));
+  L.push("مكتبة Firebase: "+(window.firebase&&firebase.firestore?("محمّلة"+(SYNC.cdn?(" من "+SYNC.cdn):"")):"غير محمّلة"));
+  L.push("حالة الشبكة: "+(navigator.onLine?"متصل":"غير متصل"));
+  L.push("التخزين المحلي لـ Firestore: "+({modern:"مفعّل (الطريقة الحديثة)",legacy:"مفعّل (الطريقة القديمة)",
+    "tab-conflict":"مفعّل في نافذة أخرى","unsupported":"غير مدعوم في هذا المتصفح",off:"غير مفعّل"}[SYNC.cache]||"—"));
+  if(!window.firebase){L.push("الحل: تأكد من الاتصال، أو اسمح بالنطاقات:");
+    L.push("  gstatic.com · googleapis.com · firebaseio.com");}
   let u=null;
   try{u=firebase.auth().currentUser}catch(e){}
   L.push("المستخدم السحابي: "+(u?("مسجّل "+(u.isAnonymous?"(مجهول)":"")):"غير مسجّل"));
@@ -5463,6 +5834,36 @@ $("#sp-diag").onclick=async()=>{
   alert(L.join("\n"));
 };
 
+if($("#sp-load"))$("#sp-load").onclick=async()=>{
+  setSync("wait","جارٍ تحميل المكتبة…");
+  const ok=await ensureFirebase();
+  if(!ok)return alert("تعذّر تحميل مكتبة Firebase.\n\nالأسباب المحتملة:\n"+
+    "• لا يوجد اتصال بالإنترنت\n• شبكة الجهة تحجب gstatic.com أو googleapis.com\n\n"+
+    "الحل: افتح البرنامج على شبكة غير محجوبة، أو اطلب من تقنية المعلومات السماح بهذه النطاقات.\n\n"+
+    "بياناتك محفوظة محليًا ولن تُفقد.");
+  await initSync();
+  if(SYNC.ready){await pushAll();alert("تم الاتصال والمزامنة بنجاح")}
+};
+if($("#sp-noauth")){
+  $("#sp-noauth").checked=!!DB.settings.syncNoAuth;
+  $("#sp-noauth").onchange=async e=>{
+    DB.settings.syncNoAuth=e.target.checked;
+    await save("dir:settings",DB.settings);
+    if(e.target.checked)alert(
+"وضع المزامنة بلا مصادقة\n\n"+
+"يُستخدم عند تشغيل البرنامج كملف محلي، لأن Firebase لا يسمح بتسجيل الدخول من file://\n\n"+
+"يتطلب تعديل قواعد Firestore إلى:\n\n"+
+"rules_version = '2';\n"+
+"service cloud.firestore {\n"+
+"  match /databases/{database}/documents {\n"+
+"    match /spaces/{space}/data/{doc} {\n"+
+"      allow read, write: if true;\n"+
+"    }\n  }\n}\n\n"+
+"تنبيه: هذه القواعد تفتح البيانات لمن يعرف معرّف المشروع.\n"+
+"الأفضل رفع الملف على استضافة (Firebase Hosting) والعودة للقواعد الآمنة.");
+    SYNC.ready=false;SYNC.last={};await initSync();if(SYNC.ready)await pushAll();
+  };
+}
 $("#sp-reconnect").onclick=async()=>{
   SYNC.ready=false;SYNC.last={};setSync("wait","جارٍ إعادة الاتصال…");
   try{await initSync();if(SYNC.ready){await pushAll();toast("أُعيد الاتصال ورُفعت البيانات")}
@@ -6053,6 +6454,7 @@ async function boot(){
     if(permFix)await save("dir:users",DB.users);
   }catch(e){console.error("load",e);toast("تحذير أثناء تحميل البيانات: "+e.message)}
   SYNC.loaded=true;
+  try{await takeSnapshot("عند الفتح")}catch(e){}
   /* 3) الزرع والصيانة — كل خطوة مستقلة */
   for(const step of [["seedData",()=>seedData(false)],["seedPlan",()=>seedPlan(false)],
       ["renameSecs",()=>renameSecs()],["dedupeEvents",()=>dedupeEvents()],["dedupeAll",()=>dedupeAll()],["autoStatus",()=>autoStatus()],["pruneUnits",()=>pruneUnits()]]){
